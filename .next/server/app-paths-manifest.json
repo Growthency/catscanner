@@ -1,8 +1,0 @@
-{
-  "/page": "app/page.js",
-  "/api/scan-count/route": "app/api/scan-count/route.js",
-  "/blog/page": "app/blog/page.js",
-  "/about/page": "app/about/page.js",
-  "/pricing/page": "app/pricing/page.js",
-  "/contact/page": "app/contact/page.js"
-}
