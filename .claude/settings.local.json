@@ -1,0 +1,43 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx create-next-app@14 . --typescript --tailwind --eslint --app --no-src-dir --import-alias \"@/*\" --yes)",
+      "Bash(npx create-next-app@14 . --typescript --tailwind --eslint --app --no-src-dir --import-alias \"@/*\" --yes --force)",
+      "Bash(cmd /c \"rd /s /q E:\\\\catscanner\\\\tmp_init\")",
+      "Bash(npm install:*)",
+      "Bash(npx tsc:*)",
+      "Bash(node -e \"const s = require\\(''stripe''\\); console.log\\(s.LATEST_API_VERSION\\)\")",
+      "Bash(node -e \"const Stripe = require\\(''stripe''\\); const s = new Stripe\\(''test'', {}\\); console.log\\(Stripe.LATEST_API_VERSION\\)\")",
+      "Bash(npm run:*)",
+      "Bash(npx next:*)",
+      "Bash(findstr /C:\"Route\\\\|compiled\\\\|Error\\\\|success\\\\|ready\\\\|Ready\\\\|✓\\\\|✗\\\\|Export\")",
+      "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); print\\(''''pages:'''', len\\(d.get\\(''''routes'''',{}\\)\\)\\)\")",
+      "mcp__Claude_Preview__preview_start",
+      "Bash(command -v npm)",
+      "Bash(where npm:*)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3000)",
+      "Bash(curl -s http://localhost:3000/)",
+      "Bash(netstat -ano)",
+      "Bash(ls E:/catscanner/*.config* E:/catscanner/postcss*)",
+      "Bash(taskkill /F /IM node.exe)",
+      "Bash(taskkill /F /PID 5376)",
+      "Bash(taskkill /F /PID 5376 /PID 13916)",
+      "Bash(cmd /c \"taskkill /F /PID 5376\")",
+      "Bash(wmic process:*)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3000/)",
+      "Bash(copy E:catscannerappicon.svg E:catscannerpublicicon.svg)",
+      "Bash(mkdir -p /mnt/e/catscanner/public)",
+      "Bash(cp /mnt/e/catscanner/app/icon.svg /mnt/e/catscanner/public/icon.svg)",
+      "Bash(cmd.exe /c \"mkdir E:\\\\catscanner\\\\public 2>nul & copy E:\\\\catscanner\\\\app\\\\icon.svg E:\\\\catscanner\\\\public\\\\icon.svg\")",
+      "Bash(cmd.exe /c \"dir E:\\\\catscanner\\\\public\"\")",
+      "Bash(cmd.exe /c dir E:catscannerpublic)",
+      "Bash(cmd.exe /c wmic process where \"name=''node.exe''\" delete)",
+      "Bash(cmd.exe /c curl -s -o nul -w \"%{http_code}\" http://localhost:3000/)",
+      "Bash(cmd.exe /c \"curl -s -o nul -w %%{http_code} http://localhost:3000/\")",
+      "Bash(cmd.exe /c curl http://localhost:3000/)",
+      "Bash(cmd.exe /c powershell -Command \"\\(Invoke-WebRequest -Uri http://localhost:3000/ -UseBasicParsing\\).StatusCode\")",
+      "Bash(cmd.exe /c powershell -Command \"try { $r = Invoke-WebRequest -Uri http://localhost:3000/ -UseBasicParsing; Write-Output $r.StatusCode } catch { Write-Output $_Exception.Message }\")",
+      "Bash(cmd.exe /c \"cd /d E:\\\\catscanner && node node_modules\\\\next\\\\dist\\\\bin\\\\next dev --port 3001 > E:\\\\catscanner\\\\dev.log 2>&1 &\")"
+    ]
+  }
+}
