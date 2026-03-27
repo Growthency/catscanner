@@ -9,9 +9,9 @@ import './globals.css'
 export const metadata: Metadata = {
   title: {
     template: '%s | CatScanner',
-    default: 'Home | CatScanner',
+    default: 'Cat Scanner - Free Cat Breed Identifier By Pictures Online',
   },
-  description: 'Identify any cat breed instantly with AI. Get personality profiles, health insights, and care tips. Free to try.',
+  description: 'Identify your cat instantly with our AI Cat Identifier. Upload a photo to detect cat breeds like Maine Coon, Siamese, Persian, Bengal, and 70+ feline breeds.',
   icons: {
     icon: '/icon.svg',
   },
