@@ -9,7 +9,6 @@
   <polygon points="39,23 44,14 50,26" fill="#fb923c" opacity="0.7"/>
   <!-- Cat head -->
   <ellipse cx="32" cy="36" rx="18" ry="16" fill="#f97316"/>
-  <!-- Cat face details -->
   <!-- Eyes -->
   <ellipse cx="25" cy="33" rx="3.5" ry="4" fill="#0a0a1a"/>
   <ellipse cx="39" cy="33" rx="3.5" ry="4" fill="#0a0a1a"/>

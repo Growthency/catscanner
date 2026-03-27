@@ -27,19 +27,19 @@
 }
 
 [data-theme="light"] {
-  --bg-primary: #fffaf6;
-  --bg-secondary: #fff0e6;
+  --bg-primary: #fff8f2;
+  --bg-secondary: #ffe8d4;
   --bg-card: #ffffff;
   --bg-card-hover: #fff4ec;
-  --bg-nav: rgba(255,248,240,0.90);
+  --bg-nav: rgba(255,248,240,0.92);
   --text-primary: #0a0a1a;
   --text-muted: rgba(10,10,26,0.6);
   --text-faint: rgba(10,10,26,0.38);
-  --border: rgba(249,115,22,0.15);
-  --border-hover: rgba(249,115,22,0.35);
+  --border: rgba(249,115,22,0.18);
+  --border-hover: rgba(249,115,22,0.38);
   --accent: #ea6c00;
   --accent-glow: #f97316;
-  --accent-bg: rgba(249,115,22,0.08);
+  --accent-bg: rgba(249,115,22,0.09);
   --purple: #6d28d9;
   --purple-glow: #7c3aed;
   --purple-bg: rgba(109,40,217,0.07);
@@ -59,7 +59,7 @@ body {
   transition: background 0.4s ease, color 0.4s ease;
 }
 [data-theme="light"] body {
-  background: linear-gradient(160deg, #ffffff 0%, #fff8f2 30%, #ffe8d6 65%, #ffd4b0 100%);
+  background: linear-gradient(160deg, #fff8f2 0%, #ffeedd 35%, #ffd9b3 65%, #ffc88a 100%) !important;
   min-height: 100vh;
 }
 .font-fraunces { font-family: 'Fraunces', serif; }
@@ -67,6 +67,9 @@ body {
   background: var(--bg-nav) !important;
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
+  border: none !important;
+  border-bottom: 1px solid var(--border) !important;
+  box-shadow: 0 2px 20px rgba(0,0,0,0.12);
 }
 .gradient-text {
   background: linear-gradient(135deg, #f97316, #fb923c, #a78bfa, #c4b5fd);

@@ -3,13 +3,6 @@ import Link from 'next/link'
 export default function Footer() {
   return (
     <footer style={{ background: 'var(--bg-secondary)', borderTop: '1px solid var(--border)' }}>
-      {/* Disclaimer bar */}
-      <div style={{ background: 'var(--accent-bg)', borderBottom: '1px solid var(--border)' }} className="py-2 text-center">
-        <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
-          🐾 CatScanner.org results are for informational purposes only. Always consult a veterinarian for medical advice.
-        </p>
-      </div>
-
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Brand */}
@@ -64,6 +57,13 @@ export default function Footer() {
         <div className="mt-10 pt-6 flex flex-col md:flex-row items-center justify-between gap-4" style={{ borderTop: '1px solid var(--border)' }}>
           <p className="text-sm" style={{ color: 'var(--text-faint)' }}>© 2026 CatScanner.org · English · For informational purposes only</p>
         </div>
+      </div>
+
+      {/* Disclaimer bar — very bottom */}
+      <div className="py-3 text-center" style={{ background: 'var(--accent-bg)', borderTop: '1px solid var(--border)' }}>
+        <p className="text-sm px-4" style={{ color: 'var(--text-muted)' }}>
+          🐾 CatScanner.org results are for informational purposes only. Always consult a veterinarian for medical advice.
+        </p>
       </div>
     </footer>
   )

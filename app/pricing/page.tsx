@@ -41,7 +41,7 @@ const FAQS = [
   { q: 'Do credits expire?', a: 'Never. Use them whenever you want. Credits are yours forever.' },
   { q: 'What if the AI fails to identify?', a: 'Full credit refund, automatically. No questions asked.' },
   { q: 'Can I get a refund?', a: 'Yes, within 7 days if credits are unused. Contact support@catscanner.org.' },
-  { q: 'Is there a free tier?', a: 'Yes! 3 free scans per day per device, no signup required.' },
+  { q: 'Is there a free tier?', a: 'Yes! Every device gets 3 lifetime free scans — no signup required. After that, choose a credit pack to continue.' },
   { q: 'Can I buy multiple packs?', a: 'Yes, credits stack on your account. Buy as many packs as you like.' },
 ]
 

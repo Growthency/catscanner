@@ -74,24 +74,21 @@ export async function POST(req: NextRequest) {
     }
 
     if (!userId) {
-      // Check IP rate limit
-      const today = new Date().toISOString().split('T')[0]
+      // Check IP lifetime rate limit (3 scans per IP, never resets)
       const { data: ipUsage } = await supabase
         .from('ip_usage')
-        .select('count, reset_date')
+        .select('count')
         .eq('ip_address', ip)
         .single()
 
       if (ipUsage) {
-        if (ipUsage.reset_date !== today) {
-          await supabase.from('ip_usage').update({ count: 1, reset_date: today }).eq('ip_address', ip)
-        } else if (ipUsage.count >= 3) {
+        if (ipUsage.count >= 3) {
           return NextResponse.json({ error: 'free_limit_reached' }, { status: 429 })
         } else {
           await supabase.from('ip_usage').update({ count: ipUsage.count + 1 }).eq('ip_address', ip)
         }
       } else {
-        await supabase.from('ip_usage').insert({ ip_address: ip, count: 1, reset_date: today })
+        await supabase.from('ip_usage').insert({ ip_address: ip, count: 1 })
       }
     } else {
       // Check credits
