@@ -1,6 +1,7 @@
 'use client'
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { useTheme } from '@/components/providers/ThemeProvider'
 import { Sun, Moon, Menu, X } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
@@ -11,10 +12,11 @@ export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false)
   const [user, setUser] = useState<any>(null)
   const [credits, setCredits] = useState<number | null>(null)
+  const pathname = usePathname()
 
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 10)
-    window.addEventListener('scroll', handleScroll)
+    const handleScroll = () => setScrolled(window.scrollY > 40)
+    window.addEventListener('scroll', handleScroll, { passive: true })
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
@@ -44,12 +46,33 @@ export default function Navbar() {
     { href: '/contact', label: 'Contact' },
   ]
 
+  const isActive = (href: string) =>
+    href === '/' ? pathname === '/' : pathname.startsWith(href)
+
   return (
     <nav
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? 'nav-glass' : 'bg-transparent'}`}
+      style={{
+        position: 'fixed',
+        top: 0, left: 0, right: 0,
+        zIndex: 50,
+        transition: 'all 0.4s cubic-bezier(0.4,0,0.2,1)',
+        background: scrolled ? 'var(--bg-nav)' : 'transparent',
+        backdropFilter: scrolled ? 'blur(24px) saturate(180%)' : 'none',
+        WebkitBackdropFilter: scrolled ? 'blur(24px) saturate(180%)' : 'none',
+        borderBottom: scrolled ? '1px solid var(--border)' : '1px solid transparent',
+        boxShadow: scrolled ? '0 2px 20px var(--shadow)' : 'none',
+      }}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            height: scrolled ? '56px' : '68px',
+            transition: 'height 0.4s cubic-bezier(0.4,0,0.2,1)',
+          }}
+        >
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 font-fraunces text-xl font-bold">
             <span>🐱</span>
@@ -58,17 +81,48 @@ export default function Navbar() {
           </Link>
 
           {/* Desktop nav links */}
-          <div className="hidden md:flex items-center gap-6">
-            {navLinks.map(link => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="text-sm font-medium transition-colors hover:opacity-80"
-                style={{ color: 'var(--text-muted)' }}
-              >
-                {link.label}
-              </Link>
-            ))}
+          <div className="hidden md:flex items-center gap-1">
+            {navLinks.map(link => {
+              const active = isActive(link.href)
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  style={{
+                    position: 'relative',
+                    padding: '6px 14px',
+                    borderRadius: '9999px',
+                    fontSize: '0.875rem',
+                    fontWeight: active ? 600 : 500,
+                    color: active ? 'var(--accent)' : 'var(--text-muted)',
+                    background: active ? 'var(--accent-bg)' : 'transparent',
+                    transition: 'all 0.2s ease',
+                  }}
+                  onMouseEnter={e => {
+                    if (!active) (e.currentTarget as HTMLElement).style.color = 'var(--text-primary)'
+                  }}
+                  onMouseLeave={e => {
+                    if (!active) (e.currentTarget as HTMLElement).style.color = 'var(--text-muted)'
+                  }}
+                >
+                  {link.label}
+                  {active && (
+                    <span
+                      style={{
+                        position: 'absolute',
+                        bottom: '2px',
+                        left: '50%',
+                        transform: 'translateX(-50%)',
+                        width: '16px',
+                        height: '2px',
+                        borderRadius: '2px',
+                        background: 'var(--accent)',
+                      }}
+                    />
+                  )}
+                </Link>
+              )
+            })}
           </div>
 
           {/* Right side */}
@@ -142,17 +196,20 @@ export default function Navbar() {
           >
             <X size={28} />
           </button>
-          {navLinks.map(link => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className="font-fraunces text-3xl font-bold transition-colors"
-              style={{ color: 'var(--text-primary)' }}
-              onClick={() => setMobileOpen(false)}
-            >
-              {link.label}
-            </Link>
-          ))}
+          {navLinks.map(link => {
+            const active = isActive(link.href)
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="font-fraunces text-3xl font-bold transition-colors"
+                style={{ color: active ? 'var(--accent)' : 'var(--text-primary)' }}
+                onClick={() => setMobileOpen(false)}
+              >
+                {link.label}
+              </Link>
+            )
+          })}
           <div className="flex items-center gap-4 mt-4">
             <button onClick={toggle} className="p-2 rounded-full" style={{ color: 'var(--text-muted)', background: 'var(--purple-bg)' }}>
               {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
