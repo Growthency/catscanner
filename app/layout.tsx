@@ -22,8 +22,9 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" data-theme="light" suppressHydrationWarning>
       <head>
+        <script dangerouslySetInnerHTML={{ __html: `(function(){var t=localStorage.getItem('cs-theme-v2');document.documentElement.setAttribute('data-theme',t==='dark'?'dark':'light');})();` }} />
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-CH8M30CS7C"
           strategy="afterInteractive"
