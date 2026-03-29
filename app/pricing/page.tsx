@@ -86,16 +86,19 @@ export default function PricingPage() {
           {PACKS.map(pack => (
             <div
               key={pack.id}
-              className={`relative rounded-2xl p-6 flex flex-col card-lift card-glow ${pack.popular ? 'glow-orange' : ''}`}
+              className={`relative rounded-2xl flex flex-col card-lift ${pack.popular ? 'glow-orange' : ''}`}
               style={{
                 background: pack.popular ? 'var(--bg-card-hover)' : 'var(--bg-card)',
                 border: `1px solid ${pack.popular ? 'var(--accent)' : 'var(--border)'}`,
+                overflow: 'visible',
+                padding: pack.popular ? '28px 24px 24px' : '24px',
               }}
             >
               {pack.popular && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                  <span className="px-4 py-1 rounded-full text-xs font-bold text-white" style={{background:'var(--accent)'}}>
-                    MOST POPULAR
+                <div className="absolute -top-4 left-1/2 -translate-x-1/2 whitespace-nowrap">
+                  <span className="px-4 py-1.5 rounded-full text-xs font-bold tracking-wide shadow-md"
+                    style={{background:'var(--accent)', color:'#fff', boxShadow:'0 4px 12px rgba(249,115,22,0.45)'}}>
+                    ✦ MOST POPULAR
                   </span>
                 </div>
               )}

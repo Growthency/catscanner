@@ -69,7 +69,7 @@ export default function Navbar() {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            height: scrolled ? '56px' : '68px',
+            height: scrolled ? '61px' : '68px',
             transition: 'height 0.4s cubic-bezier(0.4,0,0.2,1)',
           }}
         >
