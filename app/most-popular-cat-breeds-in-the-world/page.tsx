@@ -3,8 +3,8 @@ import Link from 'next/link'
 import Script from 'next/script'
 
 export const metadata: Metadata = {
-  title: 'Most Popular Cat Breeds in the World',
-  description: 'Explore the top 10 most popular cat breeds in the world, including temperament, size, grooming, and lifestyle fit for cat owners.',
+  title: 'Which Cat Breed is #1? Top 10 Most Popular Cats Globally',
+  description: 'Is your favorite feline on the list? Check out the most popular cat breeds in the world right now, featuring the gentle Maine Coon, the vocal Siamese, and more.',
 }
 
 const schema = {
