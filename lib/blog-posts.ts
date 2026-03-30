@@ -23,6 +23,16 @@ export const BLOG_POSTS: BlogPost[] = [
     featured: true,
   },
   {
+    slug: '/how-to-identify-mixed-breed-cat',
+    title: 'How to Identify Mixed Breed Cat with Pictures?',
+    excerpt: 'Analyze visible traits like coat pattern, face shape, ear structure, and body size to identify a mixed breed cat. Learn how AI + visual analysis work together to detect breed combinations.',
+    category: 'Guide',
+    readTime: '14 min',
+    date: '2026-03-30',
+    image: 'https://images.unsplash.com/photo-1548247416-ec66f4900b2e?w=800&q=80',
+    imageAlt: 'how to identify mixed breed cat',
+  },
+  {
     slug: '/how-to-use-cat-breed-scanner',
     title: 'How to Use Cat Breed Scanner? AI Cat Identifier by Photo Guide',
     excerpt: 'Learn how to use a Cat Breed Scanner step by step. Upload a photo, let AI analyze coat pattern, face shape, and ear structure, and instantly get your cat\'s breed.',
