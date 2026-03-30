@@ -56,7 +56,7 @@ export default function HowToIdentifyKittenBreedPage() {
               <span style={{ color: 'var(--purple)', fontStyle: 'italic' }}>By Pictures?</span>
             </h1>
             <p style={{ fontSize: '1.1rem', lineHeight: 1.8, color: 'var(--text-muted)', maxWidth: '700px', margin: '0 auto 1.25rem' }}>
-              To <strong>identify a kitten&apos;s breed</strong>, observe key traits like coat pattern, eye color, ear shape, and body structure, then compare them with known breeds or use an <strong>AI Cat Breed Scanner</strong>. Because kittens are still developing, their features may not fully represent adult breed traits.
+              To <strong>identify a kitten&apos;s breed</strong>, observe key traits like coat pattern, eye color, ear shape, and body structure, then compare them with known breeds or use an <Link href="/" style={{ color: 'var(--accent)', fontWeight: 700, textDecoration: 'underline' }}>AI Cat Breed Scanner</Link>. Because kittens are still developing, their features may not fully represent adult breed traits.
             </p>
             <p style={{ fontSize: '1rem', lineHeight: 1.8, color: 'var(--text-muted)', maxWidth: '680px', margin: '0 auto 2rem' }}>
               Tools powered by artificial intelligence, computer vision, and machine learning can analyze kitten photos and match them with breeds such as the <strong>Maine Coon</strong>, <strong>Siamese cat</strong>, or <strong>Persian cat</strong>, but results are usually estimates rather than exact matches.
@@ -211,7 +211,7 @@ export default function HowToIdentifyKittenBreedPage() {
               How AI Cat Breed Scanners Identify Kitten Breeds
             </h2>
             <p style={{ fontSize: '1.05rem', lineHeight: 1.85, color: 'var(--text-muted)', marginBottom: '1.5rem' }}>
-              Modern <strong>AI Cat Breed Identifiers</strong> use advanced technologies to analyze kitten images.
+              Modern <Link href="/" style={{ color: 'var(--accent)', fontWeight: 700, textDecoration: 'underline' }}>AI Cat Breed Identifiers</Link> use advanced technologies to analyze kitten images.
             </p>
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1.25rem', marginBottom: '1.5rem' }}>
@@ -428,7 +428,7 @@ export default function HowToIdentifyKittenBreedPage() {
                 Start Identifying Your Kitten Today
               </h2>
               <p style={{ fontSize: '1.05rem', lineHeight: 1.8, color: 'var(--text-muted)', maxWidth: '560px', margin: '0 auto 1.75rem' }}>
-                If you&apos;re wondering <em>&quot;What breed is my kitten?&quot;</em>, start by uploading a photo to an <strong>AI Cat Breed Scanner</strong>. Combine AI results with visual analysis to understand your kitten&apos;s unique traits and breed influences.
+                If you&apos;re wondering <em>&quot;What breed is my kitten?&quot;</em>, start by uploading a photo to our <Link href="/" style={{ color: 'var(--accent)', fontWeight: 700, textDecoration: 'underline' }}>AI Cat Breed Scanner</Link>. Combine AI results with visual analysis to understand your kitten&apos;s unique traits and breed influences.
               </p>
               <Link
                 href="/#scanner"

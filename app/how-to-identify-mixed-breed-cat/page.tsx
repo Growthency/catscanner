@@ -57,7 +57,7 @@ export default function HowToIdentifyMixedBreedCatPage() {
               <span style={{ color: 'var(--accent)', fontStyle: 'italic' }}>with Pictures? (AI + Visual Guide)</span>
             </h1>
             <p style={{ fontSize: '1.1rem', lineHeight: 1.8, color: 'var(--text-muted)', maxWidth: '700px', margin: '0 auto 1.25rem' }}>
-              To <strong>identify a mixed breed cat</strong> using pictures, analyze visible traits like coat pattern, face shape, ear structure, and body size, then compare them with known breeds or use an <strong>AI Cat Breed Scanner</strong>.
+              To <strong>identify a mixed breed cat</strong> using pictures, analyze visible traits like coat pattern, face shape, ear structure, and body size, then compare them with known breeds or use an <Link href="/" style={{ color: 'var(--accent)', fontWeight: 700, textDecoration: 'underline' }}>AI Cat Breed Scanner</Link>.
             </p>
             <p style={{ fontSize: '1rem', lineHeight: 1.8, color: 'var(--text-muted)', maxWidth: '680px', margin: '0 auto 2rem' }}>
               Modern tools use computer vision and machine learning to detect similarities with breeds such as the <strong>Maine Coon</strong>, <strong>Siamese cat</strong>, or <strong>Bengal cat</strong>. While visual identification is helpful, mixed-breed cats often show combined traits, so results are usually probabilistic rather than exact.
@@ -123,7 +123,7 @@ export default function HowToIdentifyMixedBreedCatPage() {
             </ul>
             <div style={{ background: 'rgba(249,115,22,0.07)', border: '1px solid rgba(249,115,22,0.2)', borderRadius: '1rem', padding: '1rem 1.25rem' }}>
               <p style={{ fontSize: '0.97rem', lineHeight: 1.8, color: 'var(--text-muted)', margin: 0 }}>
-                💡 This is why tools like <strong>AI Cat Identifiers</strong> are useful—they combine image recognition + breed databases to improve accuracy.
+                💡 This is why tools like our <Link href="/" style={{ color: 'var(--accent)', fontWeight: 700, textDecoration: 'underline' }}>AI Cat Identifier</Link> are useful—they combine image recognition + breed databases to improve accuracy.
               </p>
             </div>
           </section>
@@ -202,7 +202,7 @@ export default function HowToIdentifyMixedBreedCatPage() {
               How AI and Image Recognition Identify Mixed Breed Cats
             </h2>
             <p style={{ fontSize: '1.05rem', lineHeight: 1.85, color: 'var(--text-muted)', marginBottom: '1.25rem' }}>
-              Modern <strong>AI Cat Breed Scanners</strong> use advanced technologies to analyze cat images and predict breed combinations.
+              Modern <Link href="/" style={{ color: 'var(--accent)', fontWeight: 700, textDecoration: 'underline' }}>AI Cat Breed Scanners</Link> use advanced technologies to analyze cat images and predict breed combinations.
             </p>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0.85rem', marginBottom: '1.5rem' }}>
               {[

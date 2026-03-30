@@ -219,7 +219,9 @@ export default function MostPopularCatBreedsPage() {
               <strong style={{ color: 'var(--accent)' }}>Abyssinian</strong> are widely recognized because they stand out in appearance, personality, and adaptability as domestic cats.
             </p>
             <p className="text-base leading-relaxed max-w-3xl mx-auto" style={{ color: 'var(--text-muted)' }}>
-              If you are comparing the top 10 cat breeds, this guide explains what makes each one popular, how they differ, and which type of feline may suit your home, lifestyle, and care expectations best.
+              If you are comparing the top 10 cat breeds, this guide explains what makes each one popular, how they differ, and which type of feline may suit your home, lifestyle, and care expectations best. Once you know the breed, use our{' '}
+              <Link href="/" style={{ color: 'var(--accent)', fontWeight: 600, textDecoration: 'underline' }}>AI Cat Breed Identifier</Link>{' '}
+              to scan your own cat instantly.
             </p>
           </div>
         </section>
@@ -953,7 +955,9 @@ export default function MostPopularCatBreedsPage() {
             </div>
             <div className="text-center">
               <p className="mb-6 leading-relaxed" style={{ color: 'var(--text-muted)' }}>
-                Ready to identify your cat&apos;s breed instantly? Try our free AI scanner now.
+                Ready to identify your cat&apos;s breed instantly? Try our free{' '}
+                <Link href="/" style={{ color: 'var(--accent)', fontWeight: 600, textDecoration: 'underline' }}>Cat Scanner</Link>{' '}
+                — no signup required.
               </p>
               <Link
                 href="/#scanner"

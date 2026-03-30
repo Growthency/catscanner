@@ -61,7 +61,7 @@ export default function HowCanITellWhatBreedMyKittenIsPage() {
             </p>
             <div style={{ background: 'rgba(249,115,22,0.07)', border: '1px solid rgba(249,115,22,0.2)', borderRadius: '1rem', padding: '1rem 1.25rem', maxWidth: '680px', margin: '0 auto 2rem', textAlign: 'left' }}>
               <p style={{ fontSize: '1rem', lineHeight: 1.8, color: 'var(--text-muted)', margin: 0 }}>
-                💡 <strong style={{ color: 'var(--text-primary)' }}>The truth is:</strong> to tell what breed your kitten is, you need to combine visual observation (coat, face, body) with tools like an <strong>AI Cat Breed Scanner</strong>. Even then, most results are estimates—because many kittens are mixed breed cats, not purebred.
+                💡 <strong style={{ color: 'var(--text-primary)' }}>The truth is:</strong> to tell what breed your kitten is, you need to combine visual observation (coat, face, body) with tools like an <Link href="/" style={{ color: 'var(--accent)', fontWeight: 700, textDecoration: 'underline' }}>AI Cat Breed Scanner</Link>. Even then, most results are estimates—because many kittens are mixed breed cats, not purebred.
               </p>
             </div>
             <Link
@@ -182,7 +182,7 @@ export default function HowCanITellWhatBreedMyKittenIsPage() {
               The Moment I Started Using AI Cat Breed Scanners
             </h2>
             <p style={{ fontSize: '1.05rem', lineHeight: 1.85, color: 'var(--text-muted)', marginBottom: '1.1rem' }}>
-              After guessing wrong a few times, I started using an <strong>AI Cat Breed Scanner</strong>, and honestly—it changed everything.
+              After guessing wrong a few times, I started using our <Link href="/" style={{ color: 'var(--accent)', fontWeight: 700, textDecoration: 'underline' }}>AI Cat Breed Scanner</Link>, and honestly—it changed everything.
             </p>
             <p style={{ fontSize: '1rem', lineHeight: 1.8, color: 'var(--text-muted)', marginBottom: '1.25rem' }}>These tools use:</p>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(175px, 1fr))', gap: '0.85rem', marginBottom: '1.5rem' }}>
@@ -357,7 +357,7 @@ export default function HowCanITellWhatBreedMyKittenIsPage() {
                   &quot;It looks like it has traits of a Maine Coon and maybe a Siamese cat mix.&quot;
                 </div>
                 <div style={{ background: 'var(--bg-card)', borderRadius: '0.85rem', padding: '0.9rem 1.1rem', borderLeft: '3px solid var(--purple)', fontSize: '0.97rem', color: 'var(--text-muted)', fontStyle: 'italic' }}>
-                  &quot;I checked using an AI Cat Breed Scanner — it shows a few likely matches.&quot;
+                  &quot;I checked using the <Link href="/" style={{ color: 'var(--accent)', fontWeight: 700, textDecoration: 'underline' }}>AI Cat Breed Scanner</Link> — it shows a few likely matches.&quot;
                 </div>
               </div>
               <p style={{ fontSize: '0.97rem', color: 'var(--text-muted)', margin: '1rem 0 0', fontStyle: 'italic' }}>

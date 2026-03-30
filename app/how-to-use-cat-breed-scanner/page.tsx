@@ -68,7 +68,7 @@ export default function HowToUseCatBreedScannerPage() {
               <span style={{ color: 'var(--purple)', fontStyle: 'italic' }}>AI Cat Identifier by Photo Guide</span>
             </h1>
             <p style={{ fontSize: '1.1rem', lineHeight: 1.8, color: 'var(--text-muted)', maxWidth: '700px', margin: '0 auto 2rem' }}>
-              Using a <strong>Cat Breed Scanner</strong> or <strong>AI Cat Identifier</strong> is simple: upload a clear photo of your cat, let the artificial intelligence system analyze features like coat pattern, face shape, and ear structure, and instantly receive a predicted breed with a confidence score. These tools use computer vision, machine learning, and image recognition to compare your cat with known breeds such as the Maine Coon, Siamese cat, and Persian cat. This makes it easy for pet owners to answer: <em>"What breed is my cat?"</em>
+              Using a <Link href="/" style={{ color: 'var(--accent)', fontWeight: 700, textDecoration: 'underline' }}>Cat Breed Scanner</Link> or <strong>AI Cat Identifier</strong> is simple: upload a clear photo of your cat, let the artificial intelligence system analyze features like coat pattern, face shape, and ear structure, and instantly receive a predicted breed with a confidence score. These tools use computer vision, machine learning, and image recognition to compare your cat with known breeds such as the Maine Coon, Siamese cat, and Persian cat. This makes it easy for pet owners to answer: <em>"What breed is my cat?"</em>
             </p>
             <Link
               href="/#scanner"
@@ -101,7 +101,7 @@ export default function HowToUseCatBreedScannerPage() {
               Introduction to Cat Breed Scanner and AI Cat Identifier
             </h2>
             <p style={{ fontSize: '1.05rem', lineHeight: 1.85, color: 'var(--text-muted)', marginBottom: '1rem' }}>
-              A <strong>Cat Breed Scanner</strong> is an advanced AI-powered tool designed to identify cat breeds from images. Also known as a <strong>Cat Scanner</strong>, <strong>Cat Breed Identifier</strong>, or <strong>Cat Breed Recognition</strong> system, it uses deep learning algorithms trained on thousands of feline images.
+              A <Link href="/" style={{ color: 'var(--accent)', fontWeight: 700, textDecoration: 'underline' }}>Cat Breed Scanner</Link> is an advanced AI-powered tool designed to identify cat breeds from images. Also known as a <strong>Cat Scanner</strong>, <strong>Cat Breed Identifier</strong>, or <strong>Cat Breed Recognition</strong> system, it uses deep learning algorithms trained on thousands of feline images.
             </p>
             <p style={{ fontSize: '1.05rem', lineHeight: 1.85, color: 'var(--text-muted)', marginBottom: '1.25rem' }}>These tools rely on:</p>
             <ul style={{ listStyle: 'none', padding: 0, display: 'flex', flexDirection: 'column', gap: '0.6rem', marginBottom: '1.25rem' }}>
@@ -127,7 +127,7 @@ export default function HowToUseCatBreedScannerPage() {
               How AI Cat Breed Scanner Works
             </h2>
             <p style={{ fontSize: '1.05rem', lineHeight: 1.85, color: 'var(--text-muted)', marginBottom: '1.5rem' }}>
-              An <strong>AI Cat Breed Scanner</strong> works by analyzing visual features using image recognition technology.
+              An <Link href="/" style={{ color: 'var(--accent)', fontWeight: 700, textDecoration: 'underline' }}>AI Cat Breed Scanner</Link> works by analyzing visual features using image recognition technology.
             </p>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1.25rem', marginBottom: '1.5rem' }}>
               <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '1.25rem', padding: '1.5rem', boxShadow: '0 2px 12px rgba(0,0,0,0.05)' }}>
