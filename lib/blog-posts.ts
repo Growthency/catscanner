@@ -23,6 +23,16 @@ export const BLOG_POSTS: BlogPost[] = [
     featured: true,
   },
   {
+    slug: '/how-can-i-tell-what-breed-my-kitten-is',
+    title: 'How Can I Tell What Breed My Kitten Is?',
+    excerpt: "Stop guessing your kitten's breed. From coat patterns to paw shapes, learn the real traits that reveal breed influences — plus how AI Cat Breed Scanners make identification instant.",
+    category: 'Guide',
+    readTime: '9 min',
+    date: '2026-03-30',
+    image: '/how-can-i-tell-what-breed-my-kitten-is-1.webp',
+    imageAlt: 'how can I tell what breed my kitten is',
+  },
+  {
     slug: '/how-to-identify-kitten-breed',
     title: 'How to Identify Kitten Breed By Pictures?',
     excerpt: "Observe coat pattern, eye color, ear shape, and body structure to identify a kitten's breed. Learn how AI Cat Breed Scanners estimate kitten breeds from photos.",
