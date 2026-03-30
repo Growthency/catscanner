@@ -262,7 +262,7 @@ export default function MostPopularCatBreedsPage() {
           <div className="max-w-4xl mx-auto">
             <div style={{ borderRadius: '1.5rem', border: '1px solid var(--border)', background: 'var(--bg-card)', padding: '0.75rem', boxShadow: '0 0 40px rgba(249,115,22,0.15)' }}>
               <img
-                src="/cat-scanner.webp"
+                src="/most-popular-cat-breeds-in-the-world.webp"
                 alt="most popular cat breeds in the world"
                 style={{ width: '100%', height: 'auto', borderRadius: '1rem', display: 'block' }}
               />

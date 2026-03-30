@@ -18,7 +18,7 @@ export const BLOG_POSTS: BlogPost[] = [
     category: 'Breeds',
     readTime: '12 min',
     date: '2026-03-26',
-    image: '/cat-breed-identifier.webp',
+    image: '/most-popular-cat-breeds-in-the-world.webp',
     imageAlt: 'most popular cat breeds in the world',
     featured: true,
   },
