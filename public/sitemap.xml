@@ -38,4 +38,18 @@
     <priority>1.0</priority>
   </url>
 
+  <url>
+    <loc>https://catscanner.org/most-popular-cat-breeds-in-the-world/</loc>
+    <lastmod>2026-03-26T00:00:00+00:00</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <url>
+    <loc>https://catscanner.org/how-to-use-cat-breed-scanner/</loc>
+    <lastmod>2026-03-30T00:00:00+00:00</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
 </urlset>

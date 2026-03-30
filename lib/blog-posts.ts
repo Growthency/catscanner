@@ -22,6 +22,16 @@ export const BLOG_POSTS: BlogPost[] = [
     imageAlt: 'most popular cat breeds in the world',
     featured: true,
   },
+  {
+    slug: '/how-to-use-cat-breed-scanner',
+    title: 'How to Use Cat Breed Scanner? AI Cat Identifier by Photo Guide',
+    excerpt: 'Learn how to use a Cat Breed Scanner step by step. Upload a photo, let AI analyze coat pattern, face shape, and ear structure, and instantly get your cat\'s breed.',
+    category: 'Guide',
+    readTime: '10 min',
+    date: '2026-03-30',
+    image: 'https://images.unsplash.com/photo-1574158622682-e40e69881006?w=800&q=80',
+    imageAlt: 'how to use cat breed scanner',
+  },
 ]
 
 export const CATEGORY_COLORS: Record<string, { bg: string; text: string }> = {
