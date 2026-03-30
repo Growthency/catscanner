@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
+import Script from "next/script";
 
 const PARTICLES = [
   { left: "5%", dur: 16, delay: 0, w: 14, opacity: 0.06 },
@@ -374,8 +375,38 @@ export default function HomePage() {
     setError(null);
   }
 
+  const homeSchema = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Article",
+        "mainEntityOfPage": { "@type": "WebPage", "@id": "https://catscanner.org/" },
+        "headline": "Cat Scanner – Cat Breed AI Identifier By Pictures",
+        "description": "Identify your cat instantly with our AI Cat Identifier. Upload a photo to detect cat breeds like Maine Coon, Siamese, Persian, Bengal, and 70+ feline breeds.",
+        "image": ["https://catscanner.org/cat-scanner.webp"],
+        "author": { "@type": "Organization", "name": "Cat Scanner" },
+        "publisher": { "@type": "Organization", "name": "Cat Scanner", "logo": { "@type": "ImageObject", "url": "https://catscanner.org/cat-scanner.webp" } },
+        "articleSection": "Cat Breed Identification",
+        "keywords": ["Cat Scanner","Cat Breed AI Identifier","AI Cat Identifier","Cat Breed Scanner","Identify cat breed by picture","Cat breed detector","Cat breed recognition","Maine Coon","Siamese cat","Persian cat","Bengal cat","British Shorthair","Ragdoll","Russian Blue"]
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          { "@type": "Question", "name": "Can AI identify cat breeds?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Modern AI tools use computer vision and machine learning to analyze a cat's physical traits such as coat pattern, eye color, ear shape, and facial structure. An AI cat identifier compares these features with known breeds like the Maine Coon, Siamese cat, and Persian cat to predict the most likely breed." } },
+          { "@type": "Question", "name": "Is there a 3-3-3 rule for cats?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. The 3-3-3 rule for cats explains how cats adjust after adoption: 3 days to decompress, 3 weeks to learn routines, and about 3 months to feel fully comfortable in a new home. Animal organizations like the ASPCA often reference this guideline to help new cat owners understand feline behavior." } },
+          { "@type": "Question", "name": "Can Google identify cat breeds?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Using tools like Google Lens, Google can analyze a cat photo through image recognition technology and suggest possible breeds. However, dedicated AI tools such as a Cat Breed Identifier or Cat Scanner are usually more specialized for detecting breeds like the Bengal cat or British Shorthair." } },
+          { "@type": "Question", "name": "How to identify cat breed by photo?", "acceptedAnswer": { "@type": "Answer", "text": "You can identify a cat breed by uploading a photo to an AI Cat Breed Scanner. The system uses artificial intelligence to detect visual features like coat color, body structure, and facial shape, then compares them with known breed profiles such as the Ragdoll cat or Russian Blue." } },
+          { "@type": "Question", "name": "What is \"I love you\" in cat language?", "acceptedAnswer": { "@type": "Answer", "text": "Cats do not use spoken language like humans, but they show affection through behaviors such as slow blinking, head-butting, purring, and rubbing against their owners. Animal behavior experts say a slow blink is one of the closest signals to \"I love you\" in feline communication." } },
+          { "@type": "Question", "name": "How do you say \"hi\" in cat language?", "acceptedAnswer": { "@type": "Answer", "text": "Cats often greet humans and other cats by rubbing their head or tail against them, making soft chirping sounds, or gently blinking their eyes. These behaviors are part of feline social communication and indicate friendliness and trust." } },
+          { "@type": "Question", "name": "What is the silent killer of cats?", "acceptedAnswer": { "@type": "Answer", "text": "One of the most common \"silent killers\" in cats is chronic kidney disease, a condition that develops gradually and may show few early symptoms. Veterinary organizations such as the American Veterinary Medical Association warn that regular veterinary checkups help detect kidney disease and other hidden health issues early." } }
+        ]
+      }
+    ]
+  }
+
   return (
     <div style={{ minHeight: "100vh" }}>
+      <Script id="schema-homepage" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(homeSchema) }} />
       {/* ── HERO ── */}
       <section className="relative min-h-screen flex items-center overflow-hidden">
         <canvas
