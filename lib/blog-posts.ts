@@ -23,6 +23,16 @@ export const BLOG_POSTS: BlogPost[] = [
     featured: true,
   },
   {
+    slug: '/how-to-identify-kitten-breed',
+    title: 'How to Identify Kitten Breed By Pictures?',
+    excerpt: "Observe coat pattern, eye color, ear shape, and body structure to identify a kitten's breed. Learn how AI Cat Breed Scanners estimate kitten breeds from photos.",
+    category: 'Guide',
+    readTime: '8 min',
+    date: '2026-03-30',
+    image: 'https://images.unsplash.com/photo-1555685812-4b943f1cb0eb?w=800&q=80',
+    imageAlt: 'how to identify kitten breed',
+  },
+  {
     slug: '/how-to-identify-mixed-breed-cat',
     title: 'How to Identify Mixed Breed Cat with Pictures?',
     excerpt: 'Analyze visible traits like coat pattern, face shape, ear structure, and body size to identify a mixed breed cat. Learn how AI + visual analysis work together to detect breed combinations.',
