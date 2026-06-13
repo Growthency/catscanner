@@ -1,56 +1,97 @@
 'use client'
+import { useCallback, useEffect, useState } from 'react'
+import { supabase } from '@/lib/supabase'
 import { ADMIN as C } from '@/lib/admin-theme'
 import {
   Users, Calendar, Clock, TrendingUp, Activity, Eye, Layers,
-  RefreshCw, ChevronDown, BarChart3, FileText, Globe,
+  RefreshCw, ChevronDown, BarChart3, FileText, Globe, Loader2,
 } from 'lucide-react'
 
-// ── Placeholder data (visual only — connect Google Analytics for live numbers) ──
-const STATS_1 = [
-  { label: 'Users (30d)', value: '903', icon: Users },
-  { label: 'Users (7d)', value: '359', icon: Calendar },
-  { label: 'Today', value: '63', icon: Clock },
-  { label: 'New Users (30d)', value: '896', icon: TrendingUp },
+const RANGES: [string, string][] = [
+  ['7d', 'Last 7 Days'], ['30d', 'Last 30 Days'], ['thisMonth', 'This Month'],
+  ['lastMonth', 'Last Month'], ['365d', 'Last 365 Days'], ['lifetime', 'Lifetime'],
 ]
-const STATS_2 = [
-  { label: 'Sessions (30d)', value: '1,173', icon: Activity },
-  { label: 'Page Views (30d)', value: '2,046', icon: Eye },
-  { label: 'Total Active Users', value: '903', icon: Layers },
+const METRICS: [string, string][] = [
+  ['activeUsers', 'Active Users'], ['sessions', 'Sessions'], ['screenPageViews', 'Page Views'],
 ]
-const BARS = [38, 32, 40, 44, 48, 36, 30, 33, 28, 30, 46, 40, 55, 30, 28, 60, 58, 64, 72, 70, 62, 66, 74, 68, 56, 78, 82, 76, 80, 88, 100]
-const PAGES = [
-  { title: 'Cat Scanner - Free Cat Breed Identifier By Pictures Online', path: '/', views: 412 },
-  { title: 'Top 10 Most Popular Cat Breeds in the World', path: '/most-popular-cat-breeds-in-the-world', views: 146 },
-  { title: 'How to Use Cat Breed Scanner', path: '/how-to-use-cat-breed-scanner', views: 98 },
-  { title: 'How to Identify Mixed Breed Cat with Pictures', path: '/how-to-identify-mixed-breed-cat', views: 76 },
-  { title: 'How Can I Tell What Breed My Kitten Is', path: '/how-can-i-tell-what-breed-my-kitten-is', views: 61 },
-  { title: 'How to Identify Kitten Breed By Pictures', path: '/how-to-identify-kitten-breed', views: 47 },
-  { title: 'Pricing', path: '/pricing', views: 33 },
-]
-const COUNTRIES = [
-  { name: 'United States', users: 506 },
-  { name: 'Singapore', users: 101 },
-  { name: 'Australia', users: 59 },
-  { name: 'United Kingdom', users: 48 },
-  { name: 'Canada', users: 37 },
-  { name: 'India', users: 29 },
-  { name: 'Germany', users: 21 },
-]
-const MAX_COUNTRY = Math.max(...COUNTRIES.map((c) => c.users))
 
-function StatCard({ label, value, Icon }: { label: string; value: string; Icon: any }) {
+// Sample fallback — shown until Google Analytics is connected.
+const SAMPLE = {
+  users: 903, users7d: 359, today: 63, newUsers: 896, sessions: 1173, pageViews: 2046,
+  chart: [38, 32, 40, 44, 48, 36, 30, 33, 28, 30, 46, 40, 55, 30, 28, 60, 58, 64, 72, 70, 62, 66, 74, 68, 56, 78, 82, 76, 80, 88, 100].map((v) => ({ date: '', value: v })),
+  topPages: [
+    { path: '/', views: 412 }, { path: '/most-popular-cat-breeds-in-the-world', views: 146 },
+    { path: '/how-to-use-cat-breed-scanner', views: 98 }, { path: '/how-to-identify-mixed-breed-cat', views: 76 },
+    { path: '/pricing', views: 44 },
+  ],
+  topCountries: [
+    { name: 'United States', users: 506 }, { name: 'Singapore', users: 101 }, { name: 'Australia', users: 59 },
+    { name: 'United Kingdom', users: 48 }, { name: 'Canada', users: 37 },
+  ],
+}
+
+function StatCard({ label, value, Icon }: { label: string; value: number; Icon: any }) {
   return (
     <div className="rounded-2xl p-5" style={{ background: C.card, border: `1px solid ${C.border}` }}>
       <div className="flex items-center justify-between mb-3">
         <span className="text-sm font-medium" style={{ color: C.muted }}>{label}</span>
         <Icon size={18} style={{ color: C.accent }} />
       </div>
-      <p className="text-3xl font-bold" style={{ color: C.text }}>{value}</p>
+      <p className="text-3xl font-bold" style={{ color: C.text }}>{(value || 0).toLocaleString()}</p>
     </div>
   )
 }
 
 export default function AdminDashboard() {
+  const [range, setRange] = useState('30d')
+  const [metric, setMetric] = useState('activeUsers')
+  const [data, setData] = useState<any>(null)
+  const [connected, setConnected] = useState(false)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [openRange, setOpenRange] = useState(false)
+  const [openMetric, setOpenMetric] = useState(false)
+
+  const load = useCallback(async () => {
+    setLoading(true); setError(null)
+    const { data: { session } } = await supabase.auth.getSession()
+    try {
+      const res = await fetch(`/api/admin/analytics?range=${range}&metric=${metric}`, { headers: { Authorization: `Bearer ${session?.access_token}` } })
+      const d = await res.json()
+      setConnected(!!d.connected)
+      if (d.connected) setData(d)
+      else { setData(null); setError(d.error || null) }
+    } catch { setConnected(false); setData(null) }
+    setLoading(false)
+  }, [range, metric])
+
+  useEffect(() => { load() }, [load])
+
+  const v = connected && data ? data : SAMPLE
+  const chart: { value: number }[] = v.chart || []
+  const maxChart = Math.max(1, ...chart.map((c) => c.value))
+  const maxCountry = Math.max(1, ...(v.topCountries || []).map((c: any) => c.users))
+  const rangeLabel = RANGES.find((r) => r[0] === range)?.[1] || 'Last 30 Days'
+  const metricLabel = METRICS.find((m) => m[0] === metric)?.[1] || 'Active Users'
+  const card = { background: C.card, border: `1px solid ${C.border}` }
+
+  function Dropdown({ open, setOpen, label, icon: Icon, options, onPick, current }: any) {
+    return (
+      <div className="relative">
+        <button onClick={() => setOpen((o: boolean) => !o)} className="flex items-center gap-2 px-3.5 py-2 rounded-lg text-sm font-medium" style={{ background: C.card, border: `1px solid ${C.border}`, color: C.text }}>
+          {Icon && <Icon size={15} />} {label} <ChevronDown size={15} />
+        </button>
+        {open && (
+          <div className="absolute right-0 mt-1 z-20 rounded-lg overflow-hidden min-w-[170px]" style={{ background: C.card, border: `1px solid ${C.border}`, boxShadow: '0 8px 24px rgba(0,0,0,0.08)' }}>
+            {options.map(([val, lbl]: [string, string]) => (
+              <button key={val} onClick={() => { onPick(val); setOpen(false) }} className="block w-full text-left px-4 py-2 text-sm" style={{ color: current === val ? C.accent : C.text, background: current === val ? C.accentBg : 'transparent' }}>{lbl}</button>
+            ))}
+          </div>
+        )}
+      </div>
+    )
+  }
+
   return (
     <div className="max-w-7xl mx-auto space-y-6">
       {/* Header */}
@@ -60,106 +101,86 @@ export default function AdminDashboard() {
           <p className="text-sm mt-1" style={{ color: C.muted }}>Real-time data from Google Analytics &amp; Search Console</p>
         </div>
         <div className="flex flex-wrap items-center gap-2.5">
-          <button className="flex items-center gap-2 px-3.5 py-2 rounded-lg text-sm font-medium" style={{ background: C.card, border: `1px solid ${C.border}`, color: C.muted }}>
-            <RefreshCw size={15} /> Clear Cache
+          <button onClick={load} disabled={loading} className="flex items-center gap-2 px-3.5 py-2 rounded-lg text-sm font-medium disabled:opacity-50" style={{ background: C.card, border: `1px solid ${C.border}`, color: C.muted }}>
+            {loading ? <Loader2 size={15} className="animate-spin" /> : <RefreshCw size={15} />} Clear Cache
           </button>
-          <button className="flex items-center gap-2 px-3.5 py-2 rounded-lg text-sm font-medium" style={{ background: C.card, border: `1px solid ${C.border}`, color: C.text }}>
-            <Calendar size={15} /> Last 30 Days <ChevronDown size={15} />
-          </button>
-          <span className="flex items-center gap-1.5 text-sm font-medium" style={{ color: C.accent }}>
-            <span className="w-2 h-2 rounded-full" style={{ background: C.accent }} /> GA4 Connected
-          </span>
-          <span className="flex items-center gap-1.5 text-sm font-medium" style={{ color: C.accent }}>
-            <span className="w-2 h-2 rounded-full" style={{ background: C.accent }} /> Search Console
+          <Dropdown open={openRange} setOpen={setOpenRange} label={rangeLabel} icon={Calendar} options={RANGES} current={range} onPick={setRange} />
+          <span className="flex items-center gap-1.5 text-sm font-medium" style={{ color: connected ? C.accent : C.faint }}>
+            <span className="w-2 h-2 rounded-full" style={{ background: connected ? C.accent : C.faint }} /> GA4 {connected ? 'Connected' : 'Not connected'}
           </span>
         </div>
       </div>
 
-      {/* Sample-data notice */}
-      <div className="rounded-xl px-4 py-2.5 text-sm flex items-center gap-2" style={{ background: '#fffbeb', border: '1px solid #fde68a', color: '#b45309' }}>
-        <span>⚠️</span> Showing sample data. Connect Google Analytics to display your live numbers here.
-      </div>
+      {!connected && !loading && (
+        <div className="rounded-xl px-4 py-2.5 text-sm flex items-center gap-2" style={{ background: '#fffbeb', border: '1px solid #fde68a', color: '#b45309' }}>
+          <span>⚠️</span> Showing sample data. {error || 'Add GA4_PROPERTY_ID + GSC_SERVICE_ACCOUNT_JSON to show your live numbers here.'}
+        </div>
+      )}
 
-      {/* Stat cards — row 1 */}
+      {/* Stat cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {STATS_1.map((s) => <StatCard key={s.label} label={s.label} value={s.value} Icon={s.icon} />)}
+        <StatCard label={`Users (${rangeLabel.replace('Last ', '')})`} value={v.users} Icon={Users} />
+        <StatCard label="Users (7d)" value={v.users7d} Icon={Calendar} />
+        <StatCard label="Today" value={v.today} Icon={Clock} />
+        <StatCard label="New Users" value={v.newUsers} Icon={TrendingUp} />
       </div>
-
-      {/* Stat cards — row 2 */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        {STATS_2.map((s) => <StatCard key={s.label} label={s.label} value={s.value} Icon={s.icon} />)}
+        <StatCard label="Sessions" value={v.sessions} Icon={Activity} />
+        <StatCard label="Page Views" value={v.pageViews} Icon={Eye} />
+        <StatCard label="Total Active Users" value={v.users} Icon={Layers} />
       </div>
 
       {/* Chart */}
-      <div className="rounded-2xl p-6" style={{ background: C.card, border: `1px solid ${C.border}` }}>
-        <div className="flex items-center justify-between mb-6">
+      <div className="rounded-2xl p-6" style={card}>
+        <div className="flex items-center justify-between mb-6 gap-3 flex-wrap">
           <h2 className="flex items-center gap-2 text-base font-semibold" style={{ color: C.text }}>
-            <BarChart3 size={18} style={{ color: C.accent }} /> Daily Active Users — Last 30 Days
+            <BarChart3 size={18} style={{ color: C.accent }} /> {metricLabel} — {rangeLabel}
           </h2>
           <div className="flex items-center gap-2">
-            <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium" style={{ background: C.bg, border: `1px solid ${C.border}`, color: C.text }}>
-              Daily Active Users <ChevronDown size={13} />
-            </button>
+            <Dropdown open={openMetric} setOpen={setOpenMetric} label={metricLabel} icon={BarChart3} options={METRICS} current={metric} onPick={setMetric} />
             <span className="text-xs hidden sm:inline" style={{ color: C.faint }}>from Google Analytics</span>
           </div>
         </div>
-        <div className="flex items-end gap-1.5 h-52">
-          {BARS.map((h, i) => (
-            <div key={i} className="flex-1 rounded-t" style={{ height: `${h}%`, background: `linear-gradient(to top, ${C.accent}, #fdba74)`, opacity: 0.55 + (h / 100) * 0.45 }} />
-          ))}
-        </div>
-        <div className="flex justify-between mt-3 text-xs" style={{ color: C.faint }}>
-          <span>May 13</span>
-          <span>Jun 12</span>
-        </div>
+        {loading ? (
+          <div className="h-52 flex items-center justify-center" style={{ color: C.muted }}><Loader2 className="animate-spin" /></div>
+        ) : (
+          <div className="flex items-end gap-1 h-52">
+            {chart.map((c, i) => (
+              <div key={i} className="flex-1 rounded-t" style={{ height: `${Math.max(2, (c.value / maxChart) * 100)}%`, background: `linear-gradient(to top, ${C.accent}, #fdba74)`, opacity: 0.55 + (c.value / maxChart) * 0.45 }} title={String(c.value)} />
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Tables */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Top Pages */}
-        <div className="rounded-2xl p-6" style={{ background: C.card, border: `1px solid ${C.border}` }}>
+        <div className="rounded-2xl p-6" style={card}>
           <div className="flex items-center justify-between mb-4">
-            <h2 className="flex items-center gap-2 text-base font-semibold" style={{ color: C.text }}>
-              <FileText size={17} style={{ color: C.accent }} /> Top 25 Pages
-            </h2>
+            <h2 className="flex items-center gap-2 text-base font-semibold" style={{ color: C.text }}><FileText size={17} style={{ color: C.accent }} /> Top 25 Pages</h2>
             <span className="text-xs" style={{ color: C.faint }}>by pageviews</span>
           </div>
           <div className="space-y-1">
-            {PAGES.map((p, i) => (
-              <div key={p.path} className="flex items-center gap-3 py-2.5" style={{ borderBottom: i < PAGES.length - 1 ? `1px solid ${C.border}` : 'none' }}>
+            {(v.topPages || []).map((p: any, i: number) => (
+              <div key={i} className="flex items-center gap-3 py-2.5" style={{ borderBottom: i < v.topPages.length - 1 ? `1px solid ${C.border}` : 'none' }}>
                 <span className="text-sm font-bold w-6 shrink-0" style={{ color: C.accent }}>#{i + 1}</span>
-                <div className="min-w-0 flex-1">
-                  <p className="text-sm font-medium truncate" style={{ color: C.text }}>{p.title}</p>
-                  <p className="text-xs truncate" style={{ color: C.faint }}>{p.path}</p>
-                </div>
-                <span className="flex items-center gap-1 text-sm font-semibold shrink-0" style={{ color: C.muted }}>
-                  <Eye size={13} /> {p.views}
-                </span>
+                <p className="text-sm font-medium truncate flex-1" style={{ color: C.text }}>{p.path}</p>
+                <span className="flex items-center gap-1 text-sm font-semibold shrink-0" style={{ color: C.muted }}><Eye size={13} /> {p.views.toLocaleString()}</span>
               </div>
             ))}
           </div>
         </div>
-
-        {/* Top Countries */}
-        <div className="rounded-2xl p-6" style={{ background: C.card, border: `1px solid ${C.border}` }}>
+        <div className="rounded-2xl p-6" style={card}>
           <div className="flex items-center justify-between mb-4">
-            <h2 className="flex items-center gap-2 text-base font-semibold" style={{ color: C.text }}>
-              <Globe size={17} style={{ color: C.accent }} /> Top 25 Countries
-            </h2>
+            <h2 className="flex items-center gap-2 text-base font-semibold" style={{ color: C.text }}><Globe size={17} style={{ color: C.accent }} /> Top 25 Countries</h2>
             <span className="text-xs" style={{ color: C.faint }}>by active users</span>
           </div>
           <div className="space-y-3">
-            {COUNTRIES.map((c, i) => (
-              <div key={c.name} className="flex items-center gap-3">
+            {(v.topCountries || []).map((c: any, i: number) => (
+              <div key={i} className="flex items-center gap-3">
                 <span className="text-sm font-bold w-6 shrink-0" style={{ color: C.accent }}>#{i + 1}</span>
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-sm font-medium" style={{ color: C.text }}>{c.name}</span>
-                    <span className="text-sm font-semibold" style={{ color: C.muted }}>{c.users}</span>
-                  </div>
-                  <div className="w-full h-1.5 rounded-full overflow-hidden" style={{ background: C.bg }}>
-                    <div className="h-full rounded-full" style={{ width: `${(c.users / MAX_COUNTRY) * 100}%`, background: C.accent }} />
-                  </div>
+                  <div className="flex items-center justify-between mb-1"><span className="text-sm font-medium" style={{ color: C.text }}>{c.name}</span><span className="text-sm font-semibold" style={{ color: C.muted }}>{c.users.toLocaleString()}</span></div>
+                  <div className="w-full h-1.5 rounded-full overflow-hidden" style={{ background: C.bg }}><div className="h-full rounded-full" style={{ width: `${(c.users / maxCountry) * 100}%`, background: C.accent }} /></div>
                 </div>
               </div>
             ))}
