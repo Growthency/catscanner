@@ -1,10 +1,9 @@
 'use client'
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import Link from 'next/link'
 import { Search, ChevronLeft, ChevronRight, Clock, Calendar, ArrowRight } from 'lucide-react'
-import { BLOG_POSTS, CATEGORY_COLORS, CATEGORY_GRADIENTS, POSTS_PER_PAGE } from '@/lib/blog-posts'
-
-const ALL_CATEGORIES = ['All', ...Array.from(new Set(BLOG_POSTS.map(p => p.category)))]
+import { BLOG_POSTS, CATEGORY_COLORS, CATEGORY_GRADIENTS, POSTS_PER_PAGE, type BlogPost } from '@/lib/blog-posts'
+import { supabase } from '@/lib/supabase'
 
 function formatDate(dateStr: string) {
   return new Date(dateStr).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
@@ -14,15 +13,37 @@ export default function BlogPage() {
   const [search, setSearch] = useState('')
   const [activeCategory, setActiveCategory] = useState('All')
   const [page, setPage] = useState(1)
+  const [dbPosts, setDbPosts] = useState<BlogPost[]>([])
+
+  useEffect(() => {
+    supabase.from('posts').select('*').eq('status', 'published').order('publish_date', { ascending: false })
+      .then(({ data }) => {
+        if (!data) return
+        setDbPosts(data.map((p: any) => ({
+          slug: `/blog/${p.slug}`,
+          title: p.title,
+          excerpt: p.excerpt || p.meta_description || '',
+          category: p.category || 'Guide',
+          readTime: p.read_time || '5 min',
+          date: p.publish_date || p.created_at,
+          image: p.featured_image || '',
+          imageAlt: p.title,
+          featured: p.featured,
+        })))
+      })
+  }, [])
+
+  const allPosts = useMemo(() => [...dbPosts, ...BLOG_POSTS], [dbPosts])
+  const ALL_CATEGORIES = useMemo(() => ['All', ...Array.from(new Set(allPosts.map(p => p.category)))], [allPosts])
 
   const filtered = useMemo(() => {
     const q = search.toLowerCase().trim()
-    return BLOG_POSTS.filter(p => {
+    return allPosts.filter(p => {
       const matchCat = activeCategory === 'All' || p.category === activeCategory
       const matchSearch = !q || p.title.toLowerCase().includes(q) || p.excerpt.toLowerCase().includes(q) || p.category.toLowerCase().includes(q)
       return matchCat && matchSearch
     })
-  }, [search, activeCategory])
+  }, [search, activeCategory, allPosts])
 
   const totalPages = Math.ceil(filtered.length / POSTS_PER_PAGE)
   const paginated = filtered.slice((page - 1) * POSTS_PER_PAGE, page * POSTS_PER_PAGE)
@@ -30,7 +51,7 @@ export default function BlogPage() {
   function handleSearch(val: string) { setSearch(val); setPage(1) }
   function handleCategory(cat: string) { setActiveCategory(cat); setPage(1) }
 
-  const featuredPost = BLOG_POSTS.find(p => p.featured)
+  const featuredPost = allPosts.find(p => p.featured)
 
   return (
     <div style={{ background: 'var(--bg-primary)', minHeight: '100vh', paddingTop: '80px' }}>
@@ -141,7 +162,7 @@ export default function BlogPage() {
             >
               {cat}
               <span className="ml-1.5 text-xs opacity-70">
-                ({cat === 'All' ? BLOG_POSTS.length : BLOG_POSTS.filter(p => p.category === cat).length})
+                ({cat === 'All' ? allPosts.length : allPosts.filter(p => p.category === cat).length})
               </span>
             </button>
           ))}

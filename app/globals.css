@@ -195,3 +195,20 @@ p { line-height: 1.75; }
 
 /* ─── SECTION DIVIDERS ─── */
 .section-alt { background: var(--bg-secondary); }
+
+/* ─── ARTICLE / POST CONTENT (admin editor + public blog posts) ─── */
+.post-body { line-height: 1.8; }
+.post-body > *:first-child { margin-top: 0; }
+.post-body h2 { font-size: 1.6rem; margin: 1.8rem 0 0.8rem; color: var(--text-primary); }
+.post-body h3 { font-size: 1.3rem; margin: 1.5rem 0 0.6rem; color: var(--text-primary); }
+.post-body h4 { font-size: 1.1rem; margin: 1.2rem 0 0.5rem; color: var(--text-primary); }
+.post-body p { margin: 0 0 1rem; }
+.post-body a { color: var(--accent); text-decoration: underline; }
+.post-body ul, .post-body ol { margin: 0 0 1rem 1.4rem; }
+.post-body ul { list-style: disc; }
+.post-body ol { list-style: decimal; }
+.post-body li { margin-bottom: 0.4rem; }
+.post-body img { max-width: 100%; border-radius: 0.75rem; margin: 1rem 0; }
+.post-body blockquote { border-left: 3px solid var(--accent); padding-left: 1rem; margin: 1rem 0; font-style: italic; color: var(--text-muted); }
+.post-body strong { color: var(--text-primary); font-weight: 700; }
+.post-body[data-placeholder]:empty::before { content: attr(data-placeholder); color: var(--text-faint); }
