@@ -45,13 +45,17 @@ export default function BlogPage() {
     })
   }, [search, activeCategory, allPosts])
 
-  const totalPages = Math.ceil(filtered.length / POSTS_PER_PAGE)
-  const paginated = filtered.slice((page - 1) * POSTS_PER_PAGE, page * POSTS_PER_PAGE)
+  const featuredPost = allPosts.find(p => p.featured)
+  const showFeatured = !!featuredPost && activeCategory === 'All' && !search
+  const gridList = showFeatured ? filtered.filter(p => p !== featuredPost) : filtered
+  const FIRST = showFeatured ? 6 : POSTS_PER_PAGE
+  const totalPages = gridList.length <= FIRST ? 1 : 1 + Math.ceil((gridList.length - FIRST) / POSTS_PER_PAGE)
+  const paginated = page === 1
+    ? gridList.slice(0, FIRST)
+    : gridList.slice(FIRST + (page - 2) * POSTS_PER_PAGE, FIRST + (page - 1) * POSTS_PER_PAGE)
 
   function handleSearch(val: string) { setSearch(val); setPage(1) }
   function handleCategory(cat: string) { setActiveCategory(cat); setPage(1) }
-
-  const featuredPost = allPosts.find(p => p.featured)
 
   return (
     <div style={{ background: 'var(--bg-primary)', minHeight: '100vh', paddingTop: '80px' }}>

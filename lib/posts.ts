@@ -16,6 +16,7 @@ export type Post = {
   status: 'draft' | 'published'
   featured: boolean
   read_time: string
+  views: number
   publish_date: string | null
   created_at: string
   updated_at: string

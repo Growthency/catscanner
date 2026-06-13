@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useRouter, usePathname } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
-import { LayoutDashboard, Plus, History, BookOpen, User, CreditCard, Shield, BookMarked, HelpCircle, LogOut } from 'lucide-react'
+import { LayoutDashboard, Plus, History, BookOpen, Bookmark, User, CreditCard, Shield, BookMarked, HelpCircle, LogOut } from 'lucide-react'
 
 const sidebarItems = {
   main: [
@@ -11,6 +11,7 @@ const sidebarItems = {
     { icon: Plus, label: 'New Scan', href: '/#scanner' },
     { icon: History, label: 'Scan History', href: '/dashboard/history' },
     { icon: BookOpen, label: 'Cat Journal', href: '/dashboard/journal' },
+    { icon: Bookmark, label: 'Saved Articles', href: '/dashboard/saved' },
   ],
   account: [
     { icon: User, label: 'Profile', href: '/dashboard/profile' },
