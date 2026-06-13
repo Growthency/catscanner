@@ -15,6 +15,8 @@ CREATE TABLE IF NOT EXISTS posts (
   tags TEXT DEFAULT '',
   category TEXT DEFAULT 'Guide',
   author_name TEXT DEFAULT 'CatScanner Team',
+  author_role TEXT DEFAULT 'Cat Specialist',
+  author_photo TEXT DEFAULT '',
   access_type TEXT DEFAULT 'free',     -- 'free' | 'premium'
   status TEXT DEFAULT 'draft',         -- 'draft' | 'published'
   featured BOOLEAN DEFAULT false,      -- feature on homepage / blog hero
@@ -33,3 +35,8 @@ CREATE POLICY "Public can read published posts" ON posts
 
 CREATE INDEX IF NOT EXISTS posts_slug_idx ON posts(slug);
 CREATE INDEX IF NOT EXISTS posts_status_idx ON posts(status, publish_date DESC);
+
+-- Storage bucket for image uploads (images are auto-converted to WebP before upload).
+INSERT INTO storage.buckets (id, name, public)
+VALUES ('uploads', 'uploads', true)
+ON CONFLICT (id) DO NOTHING;

@@ -67,7 +67,13 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
         </h1>
 
         {post.author_name && (
-          <p className="text-sm mb-6" style={{ color: 'var(--text-muted)' }}>By {post.author_name}</p>
+          <div className="flex items-center gap-3 mb-6">
+            <img src={post.author_photo || '/icon.svg'} alt={post.author_name} className="w-10 h-10 rounded-full object-cover" style={{ border: '1px solid var(--border)', background: 'var(--bg-secondary)' }} />
+            <div>
+              <p className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>{post.author_name}</p>
+              {post.author_role && <p className="text-xs" style={{ color: 'var(--text-faint)' }}>{post.author_role}</p>}
+            </div>
+          </div>
         )}
 
         {post.featured_image && (

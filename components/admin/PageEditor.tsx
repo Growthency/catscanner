@@ -4,8 +4,9 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { ADMIN as C } from '@/lib/admin-theme'
-import { POST_CATEGORIES, EMPTY_POST, slugify, type Post } from '@/lib/posts'
+import { POST_CATEGORIES, EMPTY_POST, slugify, DEFAULT_AUTHOR_PHOTO, type Post } from '@/lib/posts'
 import RichTextEditor from './RichTextEditor'
+import ImageUpload from './ImageUpload'
 import { ArrowLeft, Save, Send, Search, Loader2 } from 'lucide-react'
 
 const cardStyle = { background: C.card, border: `1px solid ${C.border}` }
@@ -129,10 +130,13 @@ export default function PageEditor({ postId }: { postId?: string }) {
           </div>
 
           <div className="rounded-2xl p-5" style={cardStyle}>
-            <Field label="Featured Image" hint="Paste an image URL (e.g. /cat-scanner.webp or https://…). Leave empty for a default cover.">
+            <label className="block text-sm font-medium mb-1.5" style={labelStyle}>Featured Image</label>
+            <div className="flex gap-2">
               <input value={form.featured_image || ''} onChange={(e) => set({ featured_image: e.target.value })} placeholder="/image.webp or https://…"
-                className="w-full px-4 py-2.5 rounded-lg outline-none text-sm" style={inputStyle} />
-            </Field>
+                className="flex-1 px-4 py-2.5 rounded-lg outline-none text-sm" style={inputStyle} />
+              <ImageUpload onUploaded={(url) => set({ featured_image: url })} />
+            </div>
+            <p className="text-xs mt-1" style={{ color: C.faint }}>Any upload is auto-converted to WebP. Leave empty for a default cover.</p>
             {form.featured_image && (
               <img src={form.featured_image} alt="" className="mt-3 rounded-lg max-h-44 object-cover w-full" style={{ border: `1px solid ${C.border}` }} />
             )}
@@ -182,6 +186,29 @@ export default function PageEditor({ postId }: { postId?: string }) {
             </Field>
           </div>
 
+          {/* Author */}
+          <div className="rounded-2xl p-5 space-y-4" style={cardStyle}>
+            <h3 className="text-sm font-semibold" style={labelStyle}>Author</h3>
+            <Field label="Name">
+              <input value={form.author_name || ''} onChange={(e) => set({ author_name: e.target.value })} placeholder="CatScanner Team"
+                className="w-full px-3 py-2.5 rounded-lg outline-none text-sm" style={inputStyle} />
+            </Field>
+            <Field label="Role">
+              <input value={form.author_role || ''} onChange={(e) => set({ author_role: e.target.value })} placeholder="Cat Specialist"
+                className="w-full px-3 py-2.5 rounded-lg outline-none text-sm" style={inputStyle} />
+            </Field>
+            <div>
+              <label className="block text-sm font-medium mb-1.5" style={labelStyle}>Photo</label>
+              <div className="flex items-center gap-2">
+                <img src={form.author_photo || DEFAULT_AUTHOR_PHOTO} alt="" className="w-10 h-10 rounded-full object-cover shrink-0" style={{ border: `1px solid ${C.border}`, background: C.bg }} />
+                <input value={form.author_photo || ''} onChange={(e) => set({ author_photo: e.target.value })} placeholder="Photo URL"
+                  className="flex-1 px-3 py-2 rounded-lg outline-none text-sm" style={inputStyle} />
+                <ImageUpload onUploaded={(url) => set({ author_photo: url })} label="" />
+              </div>
+              <p className="text-xs mt-1" style={{ color: C.faint }}>Empty = default cat avatar.</p>
+            </div>
+          </div>
+
           {/* Meta */}
           <div className="rounded-2xl p-5 space-y-4" style={cardStyle}>
             <Field label="Category">
@@ -189,10 +216,6 @@ export default function PageEditor({ postId }: { postId?: string }) {
                 className="w-full px-3 py-2.5 rounded-lg outline-none text-sm" style={inputStyle}>
                 {POST_CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
               </select>
-            </Field>
-            <Field label="Author">
-              <input value={form.author_name || ''} onChange={(e) => set({ author_name: e.target.value })} placeholder="CatScanner Team"
-                className="w-full px-3 py-2.5 rounded-lg outline-none text-sm" style={inputStyle} />
             </Field>
             <Field label="Read time">
               <input value={form.read_time || ''} onChange={(e) => set({ read_time: e.target.value })} placeholder="5 min"
