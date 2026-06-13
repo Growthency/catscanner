@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Script from "next/script";
+import { supabase } from "@/lib/supabase";
 
 const PARTICLES = [
   { left: "5%", dur: 16, delay: 0, w: 14, opacity: 0.06 },
@@ -259,6 +260,7 @@ export default function HomePage() {
   const [freeScans, setFreeScans] = useState(3);
   const [limitReached, setLimitReached] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
+  const [hp, setHp] = useState<Record<string, string>>({});
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -308,6 +310,15 @@ export default function HomePage() {
       cancelAnimationFrame(animId);
       window.removeEventListener("resize", resize);
     };
+  }, []);
+
+  useEffect(() => {
+    supabase
+      .from("site_settings")
+      .select("key,value")
+      .then(({ data }) => {
+        if (data) setHp(Object.fromEntries(data.map((r: any) => [r.key, r.value])));
+      });
   }, []);
 
   useEffect(() => {
@@ -448,7 +459,7 @@ export default function HomePage() {
                   className="pulse-dot inline-block w-1.5 h-1.5 rounded-full"
                   style={{ background: "var(--accent)" }}
                 />
-                AI-POWERED · 500+ BREEDS · 3 FREE SCANS
+                {hp.hero_eyebrow || "AI-POWERED · 500+ BREEDS · 3 FREE SCANS"}
               </div>
               <h1
                 className="font-fraunces font-black leading-tight mb-4 animate-fade-up"
@@ -465,13 +476,8 @@ export default function HomePage() {
                 className="text-sm sm:text-base mb-3 animate-fade-up leading-relaxed"
                 style={{ color: "var(--text-muted)", animationDelay: "0.15s" }}
               >
-                A Cat Identifier is an artificial intelligence tool that helps
-                users identify a cat&apos;s breed simply by analyzing a photo.
-                With the help of advanced computer vision and machine learning,
-                an AI Cat Breed Scanner examines visual features such as coat
-                pattern, face shape, ear structure, and body proportions. The
-                system then compares these characteristics against a large cat
-                breed database to determine the most likely breed.
+                {hp.hero_subtitle ||
+                  "A Cat Identifier is an artificial intelligence tool that helps users identify a cat's breed simply by analyzing a photo. With the help of advanced computer vision and machine learning, an AI Cat Breed Scanner examines visual features such as coat pattern, face shape, ear structure, and body proportions. The system then compares these characteristics against a large cat breed database to determine the most likely breed."}
               </p>
               <p
                 className="text-sm sm:text-base mb-6 animate-fade-up leading-relaxed"
@@ -494,7 +500,7 @@ export default function HomePage() {
                   className="px-6 py-3 rounded-full font-semibold text-white transition-all glow-orange"
                   style={{ background: "var(--btn-primary)" }}
                 >
-                  Scan Your Cat →
+                  {hp.hero_primary_btn || "Scan Your Cat →"}
                 </Link>
                 <a
                   href="#how-it-works"
@@ -505,7 +511,7 @@ export default function HomePage() {
                     background: "var(--purple-bg)",
                   }}
                 >
-                  See How It Works
+                  {hp.hero_secondary_btn || "See How It Works"}
                 </a>
               </div>
               <div
