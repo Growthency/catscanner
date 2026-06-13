@@ -14,6 +14,9 @@ export const metadata: Metadata = {
   icons: {
     icon: '/icon.svg',
   },
+  alternates: {
+    types: { 'application/rss+xml': '/feed.xml' },
+  },
   verification: {
     google: ['RMIExaKazI_Fw3g0DRP1EksVW7WWiCH5FYGJvH8a7qs', 'rTpR8Bi_NVkQRjODAD3DNydhk-qvdgN13ywj1AXu7hY'],
   },
