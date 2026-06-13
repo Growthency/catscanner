@@ -1,8 +1,7 @@
 import type { Metadata } from 'next'
 import Script from 'next/script'
 import { ThemeProvider } from '@/components/providers/ThemeProvider'
-import Navbar from '@/components/layout/Navbar'
-import Footer from '@/components/layout/Footer'
+import SiteChrome from '@/components/layout/SiteChrome'
 import ScrollToTop from '@/components/ui/ScrollToTop'
 import './globals.css'
 
@@ -40,9 +39,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body suppressHydrationWarning>
         <ThemeProvider>
-          <Navbar />
-          <main>{children}</main>
-          <Footer />
+          <SiteChrome>{children}</SiteChrome>
           <ScrollToTop />
         </ThemeProvider>
       </body>

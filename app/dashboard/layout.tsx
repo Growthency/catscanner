@@ -90,9 +90,22 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   }
 
   return (
-    <div className="min-h-screen flex pt-16" style={{background:'var(--bg-primary)'}}>
+    <div className="min-h-screen flex" style={{background:'var(--bg-primary)'}}>
+      {/* Mobile top bar (since global navbar is hidden here) */}
+      <div className="md:hidden fixed top-0 left-0 right-0 h-14 z-40 flex items-center px-4" style={{background:'var(--bg-secondary)', borderBottom:'1px solid var(--border)'}}>
+        <Link href="/" className="flex items-center gap-1.5 font-fraunces text-lg font-bold">
+          <span>🐱</span>
+          <span style={{ color: 'var(--text-primary)' }}>Cat</span>
+          <span style={{ color: 'var(--accent)' }}>Scanner</span>
+        </Link>
+      </div>
       {/* Sidebar */}
-      <aside className="hidden md:flex flex-col w-56 fixed top-16 bottom-0 overflow-y-auto" style={{background:'var(--bg-secondary)', borderRight:'1px solid var(--border)'}}>
+      <aside className="hidden md:flex flex-col w-56 fixed top-0 bottom-0 overflow-y-auto" style={{background:'var(--bg-secondary)', borderRight:'1px solid var(--border)'}}>
+        <Link href="/" className="flex items-center gap-2 font-fraunces text-xl font-bold px-4 border-b shrink-0" style={{height:'64px', borderColor:'var(--border)'}}>
+          <span>🐱</span>
+          <span style={{ color: 'var(--text-primary)' }}>Cat</span>
+          <span style={{ color: 'var(--accent)' }}>Scanner</span>
+        </Link>
         <nav className="flex-1 p-3 space-y-1">
           <p className="text-xs font-semibold uppercase tracking-wider px-3 py-2" style={{color:'var(--text-faint)'}}>Main</p>
           {sidebarItems.main.map(item => <SidebarLink key={item.href} {...item} />)}
@@ -126,7 +139,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       </aside>
 
       {/* Main content */}
-      <main className="flex-1 md:ml-56 p-6 overflow-auto">
+      <main className="flex-1 md:ml-56 p-6 overflow-auto pt-20 md:pt-6">
         {children}
       </main>
     </div>

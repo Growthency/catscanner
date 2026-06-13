@@ -109,7 +109,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(cached.result)
     }
 
-    // Call Claude API
+    // Run the AI vision analysis
     const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
     const base64Data = imageBase64.split(',')[1]
     const mediaType = imageBase64.split(';')[0].split(':')[1] as 'image/jpeg' | 'image/png' | 'image/gif' | 'image/webp'
