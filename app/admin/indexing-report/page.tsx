@@ -39,6 +39,12 @@ export default function IndexingReport() {
       const locs = Array.from(xml.matchAll(/<loc>([^<]+)<\/loc>/g)).map((m) => m[1].trim())
       setPages(locs.length ? locs : [SITE])
     }).catch(() => setPages([SITE]))
+    ;(async () => {
+      const res = await fetch('/api/admin/scan-cache?key=indexing', { headers: await authHeader() })
+      const d = await res.json()
+      if (d?.data?.status) { setStatus(d.data.status); setConnected(true) }
+      if (d?.scannedAt) setLastScan(new Date(d.scannedAt).toLocaleString())
+    })().catch(() => {})
   }, [])
 
   async function authHeader() {
@@ -48,18 +54,21 @@ export default function IndexingReport() {
 
   async function runScan() {
     if (scanning || !pages.length) return
-    setScanning(true); setNote(null)
+    setScanning(true); setNote(null); setStatus({})
     const headers = await authHeader()
+    const acc: Record<string, Status> = {}
     for (let i = 0; i < pages.length; i += 8) {
       const chunk = pages.slice(i, i + 8)
       const res = await fetch('/api/admin/index-status', { method: 'POST', headers, body: JSON.stringify({ urls: chunk }) })
       const data = await res.json()
       if (!data.connected) { setConnected(false); setNote(data.error || 'Connect a Google service account (GSC_SERVICE_ACCOUNT_JSON) for real index status.'); break }
       setConnected(true)
-      setStatus((prev) => { const next = { ...prev }; for (const r of data.results) next[r.url] = { coverageState: r.coverageState, indexed: r.indexed }; return next })
+      for (const r of data.results) acc[r.url] = { coverageState: r.coverageState, indexed: r.indexed }
+      setStatus({ ...acc })
     }
     setLastScan(new Date().toLocaleString())
     setScanning(false)
+    if (Object.keys(acc).length) fetch('/api/admin/scan-cache', { method: 'POST', headers, body: JSON.stringify({ key: 'indexing', data: { status: acc } }) }).catch(() => {})
   }
 
   async function indexNow(urls: string[]) {
@@ -123,10 +132,25 @@ export default function IndexingReport() {
         <div className="flex items-center gap-3">
           {lastScan && <span className="text-xs" style={{ color: C.faint }}>Last scan: {lastScan}</span>}
           <button onClick={runScan} disabled={scanning} className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold text-white disabled:opacity-50" style={{ background: C.accent }}>
-            {scanning ? <Loader2 size={15} className="animate-spin" /> : <RefreshCw size={15} />} Run Scan
+            {scanning ? <Loader2 size={15} className="animate-spin" /> : <RefreshCw size={15} />} {scanning ? 'Scanning…' : 'Run Scan'}
           </button>
         </div>
       </div>
+
+      {/* Scan progress */}
+      {(scanning || Object.keys(status).length > 0) && (
+        <div className="rounded-2xl p-4 flex items-center gap-4" style={card}>
+          <span className="text-sm font-semibold whitespace-nowrap" style={{ color: C.text }}>
+            {scanning ? 'Checking URLs…' : 'Scanned'} {Object.keys(status).length} / {pages.length}
+          </span>
+          <div className="flex-1 h-2 rounded-full overflow-hidden" style={{ background: C.bg }}>
+            <div className="h-full rounded-full transition-all" style={{ width: `${pages.length ? (Object.keys(status).length / pages.length) * 100 : 0}%`, background: C.accent }} />
+          </div>
+          <span className="text-sm font-bold whitespace-nowrap" style={{ color: C.accent }}>
+            {pages.length ? Math.round((Object.keys(status).length / pages.length) * 100) : 0}%
+          </span>
+        </div>
+      )}
 
       {/* SEO Boost Tools */}
       <div className="rounded-2xl p-4" style={{ background: C.bg, border: `1px solid ${C.border}` }}>

@@ -46,6 +46,13 @@ export default function SeoHealth() {
         setPages(locs.length ? locs : ['https://catscanner.org/'])
       })
       .catch(() => setPages(['https://catscanner.org/']))
+    ;(async () => {
+      const { data: { session } } = await supabase.auth.getSession()
+      const res = await fetch('/api/admin/scan-cache?key=seo-health', { headers: { Authorization: `Bearer ${session?.access_token}` } })
+      const d = await res.json()
+      if (d?.data?.results) setResults(d.data.results)
+      if (d?.scannedAt) setLastScan(new Date(d.scannedAt).toLocaleString())
+    })().catch(() => {})
   }, [])
 
   const remaining = pages.filter((p) => !results[p])
@@ -55,21 +62,21 @@ export default function SeoHealth() {
     if (!urls.length || scanning) return
     setScanning(true); setError(null)
     const { data: { session } } = await supabase.auth.getSession()
+    const headers = { Authorization: `Bearer ${session?.access_token}`, 'Content-Type': 'application/json' }
+    const acc: Record<string, PageResult> = { ...results }
     for (let i = 0; i < urls.length; i += 8) {
       const chunk = urls.slice(i, i + 8)
       try {
-        const res = await fetch('/api/admin/seo-scan', {
-          method: 'POST',
-          headers: { Authorization: `Bearer ${session?.access_token}`, 'Content-Type': 'application/json' },
-          body: JSON.stringify({ urls: chunk }),
-        })
+        const res = await fetch('/api/admin/seo-scan', { method: 'POST', headers, body: JSON.stringify({ urls: chunk }) })
         const data = await res.json()
         if (!res.ok) { setError(data.error || 'Scan failed. Make sure you are signed in as an admin.'); break }
-        setResults((prev) => { const next = { ...prev }; for (const r of data.results) next[r.url] = r; return next })
+        for (const r of data.results) acc[r.url] = r
+        setResults({ ...acc })
       } catch { setError('Scan request failed.'); break }
     }
     setLastScan(new Date().toLocaleString())
     setScanning(false)
+    fetch('/api/admin/scan-cache', { method: 'POST', headers, body: JSON.stringify({ key: 'seo-health', data: { results: acc } }) }).catch(() => {})
   }
 
   const totalPassed = all.reduce((s, r) => s + r.passed, 0)
