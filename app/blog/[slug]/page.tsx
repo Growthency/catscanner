@@ -58,6 +58,35 @@ function processContent(html: string): { html: string; toc: { id: string; text: 
   return { html: out, toc }
 }
 
+// External-link rel rules, applied to outbound <a> tags in article content.
+const getLinkRules = cache(async (): Promise<{ domain: string; nofollow: boolean; sponsored: boolean }[]> => {
+  try {
+    const supabase = createServerClient()
+    const { data } = await supabase.from('external_link_rules').select('domain,nofollow,sponsored')
+    return data || []
+  } catch {
+    return []
+  }
+})
+
+function applyLinkRules(html: string, rules: { domain: string; nofollow: boolean; sponsored: boolean }[]): string {
+  if (!rules.length) return html
+  return html.replace(/<a\b([^>]*)>/gi, (full, attrs) => {
+    const href = (attrs.match(/href=["']([^"']+)["']/i) || [])[1]
+    if (!href) return full
+    let domain = ''
+    try { domain = new URL(href, 'https://catscanner.org').hostname.replace(/^www\./, '') } catch { return full }
+    if (domain === 'catscanner.org') return full
+    const rule = rules.find((r) => domain === r.domain || domain.endsWith('.' + r.domain))
+    if (!rule) return full
+    const rels = ['noopener']
+    if (rule.nofollow) rels.push('nofollow')
+    if (rule.sponsored) rels.push('sponsored')
+    const cleaned = attrs.replace(/\srel=["'][^"']*["']/gi, '')
+    return `<a${cleaned} rel="${rels.join(' ')}">`
+  })
+}
+
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
   const post = await getPost(params.slug)
   if (!post) return { title: 'Article not found | CatScanner' }
@@ -98,7 +127,8 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
   const post = await getPost(params.slug)
   if (!post) notFound()
 
-  const { html, toc } = processContent(post.content || '')
+  const rules = await getLinkRules()
+  const { html, toc } = processContent(applyLinkRules(post.content || '', rules))
   const { popular, recent } = await getRelated(post.slug)
 
   return (

@@ -3,6 +3,7 @@ import Script from 'next/script'
 import { ThemeProvider } from '@/components/providers/ThemeProvider'
 import SiteChrome from '@/components/layout/SiteChrome'
 import ScrollToTop from '@/components/ui/ScrollToTop'
+import HeaderScripts from '@/components/HeaderScripts'
 import './globals.css'
 
 export const metadata: Metadata = {
@@ -45,6 +46,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <SiteChrome>{children}</SiteChrome>
           <ScrollToTop />
         </ThemeProvider>
+        <HeaderScripts />
       </body>
     </html>
   )
