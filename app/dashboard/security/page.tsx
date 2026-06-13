@@ -1,12 +1,34 @@
 'use client'
 import { useState } from 'react'
 import { supabase } from '@/lib/supabase'
+import { Eye, EyeOff } from 'lucide-react'
+
+function PasswordField({ label, value, onChange, placeholder }: { label: string; value: string; onChange: (v: string) => void; placeholder: string }) {
+  const [show, setShow] = useState(false)
+  return (
+    <div>
+      <label className="block text-sm font-medium mb-1.5" style={{ color: 'var(--text-muted)' }}>{label}</label>
+      <div className="relative">
+        <input
+          type={show ? 'text' : 'password'} value={value} onChange={(e) => onChange(e.target.value)} required
+          className="w-full px-4 py-2.5 pr-11 rounded-xl outline-none text-sm"
+          style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}
+          placeholder={placeholder}
+        />
+        <button type="button" onClick={() => setShow((s) => !s)} title={show ? 'Hide' : 'Show'}
+          className="absolute right-3 top-1/2 -translate-y-1/2" style={{ color: 'var(--text-faint)' }}>
+          {show ? <EyeOff size={18} /> : <Eye size={18} />}
+        </button>
+      </div>
+    </div>
+  )
+}
 
 export default function SecurityPage() {
   const [password, setPassword] = useState('')
   const [confirm, setConfirm] = useState('')
   const [loading, setLoading] = useState(false)
-  const [msg, setMsg] = useState<{type:'success'|'error', text:string} | null>(null)
+  const [msg, setMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
 
   async function changePassword(e: React.FormEvent) {
     e.preventDefault()
@@ -26,40 +48,24 @@ export default function SecurityPage() {
 
   return (
     <div className="max-w-2xl mx-auto space-y-6">
-      <h1 className="font-fraunces text-3xl font-bold" style={{color:'var(--text-primary)'}}>Security</h1>
+      <h1 className="font-fraunces text-3xl font-bold" style={{ color: 'var(--text-primary)' }}>Security</h1>
 
-      <div className="rounded-2xl p-6" style={{background:'var(--bg-card)', border:'1px solid var(--border)'}}>
-        <h2 className="font-fraunces text-xl font-bold mb-4" style={{color:'var(--text-primary)'}}>Change Password</h2>
+      <div className="rounded-2xl p-6" style={{ background: 'var(--bg-card)', border: '1px solid var(--border)' }}>
+        <h2 className="font-fraunces text-xl font-bold mb-4" style={{ color: 'var(--text-primary)' }}>Change Password</h2>
         <form onSubmit={changePassword} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium mb-1.5" style={{color:'var(--text-muted)'}}>New Password</label>
-            <input
-              type="password" value={password} onChange={e=>setPassword(e.target.value)} required
-              className="w-full px-4 py-2.5 rounded-xl outline-none text-sm"
-              style={{background:'var(--bg-secondary)', border:'1px solid var(--border)', color:'var(--text-primary)'}}
-              placeholder="Min. 6 characters"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-1.5" style={{color:'var(--text-muted)'}}>Confirm New Password</label>
-            <input
-              type="password" value={confirm} onChange={e=>setConfirm(e.target.value)} required
-              className="w-full px-4 py-2.5 rounded-xl outline-none text-sm"
-              style={{background:'var(--bg-secondary)', border:'1px solid var(--border)', color:'var(--text-primary)'}}
-              placeholder="Repeat password"
-            />
-          </div>
-          {msg && <p className="text-sm" style={{color: msg.type==='success' ? '#22c55e' : '#ef4444'}}>{msg.text}</p>}
-          <button type="submit" disabled={loading} className="px-5 py-2.5 rounded-xl text-sm font-semibold text-white" style={{background:'var(--btn-primary)'}}>
+          <PasswordField label="New Password" value={password} onChange={setPassword} placeholder="Min. 6 characters" />
+          <PasswordField label="Confirm New Password" value={confirm} onChange={setConfirm} placeholder="Repeat password" />
+          {msg && <p className="text-sm" style={{ color: msg.type === 'success' ? '#22c55e' : '#ef4444' }}>{msg.text}</p>}
+          <button type="submit" disabled={loading} className="px-5 py-2.5 rounded-xl text-sm font-semibold text-white" style={{ background: 'var(--btn-primary)' }}>
             {loading ? 'Updating...' : 'Update Password'}
           </button>
         </form>
       </div>
 
-      <div className="rounded-2xl p-6" style={{background:'var(--bg-card)', border:'1px solid var(--border)'}}>
-        <h2 className="font-fraunces text-xl font-bold mb-2" style={{color:'var(--text-primary)'}}>Sessions</h2>
-        <p className="text-sm mb-4" style={{color:'var(--text-muted)'}}>Sign out from all devices, including this one.</p>
-        <button onClick={signOutAll} className="px-5 py-2.5 rounded-xl text-sm font-semibold" style={{border:'1px solid rgba(239,68,68,0.4)', color:'#ef4444'}}>
+      <div className="rounded-2xl p-6" style={{ background: 'var(--bg-card)', border: '1px solid var(--border)' }}>
+        <h2 className="font-fraunces text-xl font-bold mb-2" style={{ color: 'var(--text-primary)' }}>Sessions</h2>
+        <p className="text-sm mb-4" style={{ color: 'var(--text-muted)' }}>Sign out from all devices, including this one.</p>
+        <button onClick={signOutAll} className="px-5 py-2.5 rounded-xl text-sm font-semibold" style={{ border: '1px solid rgba(239,68,68,0.4)', color: '#ef4444' }}>
           Sign Out All Devices
         </button>
       </div>
