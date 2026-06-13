@@ -7,7 +7,7 @@ export const ADMIN = {
   text: '#0f172a',
   muted: '#64748b',
   faint: '#94a3b8',
-  accent: '#059669',
-  accentBg: '#ecfdf5',
-  accentSoft: '#d1fae5',
+  accent: '#f97316',
+  accentBg: '#fff7ed',
+  accentSoft: '#ffedd5',
 }

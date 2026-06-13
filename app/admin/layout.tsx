@@ -61,7 +61,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       <aside className="hidden md:flex flex-col w-60 fixed top-0 bottom-0 overflow-y-auto" style={{ background: C.sidebar, borderRight: `1px solid ${C.border}` }}>
         {/* Brand */}
         <div className="flex items-center gap-2.5 px-5 h-16 shrink-0" style={{ borderBottom: `1px solid ${C.border}` }}>
-          <div className="w-8 h-8 rounded-lg flex items-center justify-center font-bold text-white text-sm" style={{ background: C.accent }}>M</div>
+          <div className="w-8 h-8 rounded-lg flex items-center justify-center font-bold text-white text-sm" style={{ background: C.accent }}>C</div>
           <span className="font-bold text-lg" style={{ color: C.text }}>Admin</span>
           <span className="text-[10px] font-bold px-1.5 py-0.5 rounded" style={{ background: C.accentSoft, color: C.accent }}>PRO</span>
         </div>
@@ -99,7 +99,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
       {/* Mobile top bar */}
       <div className="md:hidden fixed top-0 left-0 right-0 h-14 z-40 flex items-center gap-2 px-4" style={{ background: C.sidebar, borderBottom: `1px solid ${C.border}` }}>
-        <div className="w-7 h-7 rounded-lg flex items-center justify-center font-bold text-white text-xs" style={{ background: C.accent }}>M</div>
+        <div className="w-7 h-7 rounded-lg flex items-center justify-center font-bold text-white text-xs" style={{ background: C.accent }}>C</div>
         <span className="font-bold" style={{ color: C.text }}>Admin</span>
         <span className="text-[10px] font-bold px-1.5 py-0.5 rounded" style={{ background: C.accentSoft, color: C.accent }}>PRO</span>
       </div>

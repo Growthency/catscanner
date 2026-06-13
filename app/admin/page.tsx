@@ -105,7 +105,7 @@ export default function AdminDashboard() {
         </div>
         <div className="flex items-end gap-1.5 h-52">
           {BARS.map((h, i) => (
-            <div key={i} className="flex-1 rounded-t" style={{ height: `${h}%`, background: `linear-gradient(to top, ${C.accent}, #34d399)`, opacity: 0.55 + (h / 100) * 0.45 }} />
+            <div key={i} className="flex-1 rounded-t" style={{ height: `${h}%`, background: `linear-gradient(to top, ${C.accent}, #fdba74)`, opacity: 0.55 + (h / 100) * 0.45 }} />
           ))}
         </div>
         <div className="flex justify-between mt-3 text-xs" style={{ color: C.faint }}>
