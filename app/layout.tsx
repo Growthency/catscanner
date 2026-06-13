@@ -15,7 +15,7 @@ export const metadata: Metadata = {
     icon: '/icon.svg',
   },
   verification: {
-    google: 'RMIExaKazI_Fw3g0DRP1EksVW7WWiCH5FYGJvH8a7qs',
+    google: ['RMIExaKazI_Fw3g0DRP1EksVW7WWiCH5FYGJvH8a7qs', 'rTpR8Bi_NVkQRjODAD3DNydhk-qvdgN13ywj1AXu7hY'],
   },
 }
 
