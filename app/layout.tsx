@@ -25,7 +25,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <script dangerouslySetInnerHTML={{ __html: `(function(){var t=localStorage.getItem('cs-theme-v2');document.documentElement.setAttribute('data-theme',t==='dark'?'dark':'light');})();` }} />
         <Script
-          src="https://www.googletagmanager.com/gtag/js?id=G-CH8M30CS7C"
+          src="https://www.googletagmanager.com/gtag/js?id=G-TQ3M8D23N7"
           strategy="afterInteractive"
         />
         <Script id="google-analytics" strategy="afterInteractive">
@@ -33,7 +33,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
             gtag('js', new Date());
-            gtag('config', 'G-CH8M30CS7C');
+            gtag('config', 'G-TQ3M8D23N7');
           `}
         </Script>
       </head>
