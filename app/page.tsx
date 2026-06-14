@@ -151,9 +151,13 @@ async function hashImage(base64: string): Promise<string> {
 }
 
 async function resizeImage(file: File): Promise<string> {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     const img = new Image();
     const url = URL.createObjectURL(file);
+    img.onerror = () => {
+      URL.revokeObjectURL(url);
+      reject(new Error("Could not read that image. Please try a JPG, PNG or WEBP photo."));
+    };
     img.onload = () => {
       const max = 800;
       let { width, height } = img;
@@ -372,8 +376,8 @@ export default function HomePage() {
       }
       setResult(data);
       setFreeScans((prev) => Math.max(0, prev - 1));
-    } catch {
-      setError("Something went wrong. Please try again.");
+    } catch (e: any) {
+      setError(e?.message || "Something went wrong. Please try again.");
     } finally {
       setLoading(false);
     }

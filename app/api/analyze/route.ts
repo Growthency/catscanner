@@ -153,8 +153,9 @@ export async function POST(req: NextRequest) {
     })
 
     return NextResponse.json(result)
-  } catch (err) {
+  } catch (err: any) {
     console.error('Analyze error:', err)
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    const msg = err?.error?.message || err?.message || 'Internal server error'
+    return NextResponse.json({ error: `Scan failed: ${msg}` }, { status: 500 })
   }
 }
