@@ -4,7 +4,7 @@ import { supabase } from '@/lib/supabase'
 import { ADMIN as C } from '@/lib/admin-theme'
 import {
   Users, Calendar, Clock, TrendingUp, Activity, Eye, Layers,
-  RefreshCw, ChevronDown, BarChart3, FileText, Globe, Loader2,
+  RefreshCw, ChevronDown, BarChart3, FileText, Globe, Loader2, Search, Sparkles,
 } from 'lucide-react'
 
 const RANGES: [string, string][] = [
@@ -69,6 +69,7 @@ export default function AdminDashboard() {
   const maxChart = Math.max(1, ...chartData.flatMap((c) => [c.a, c.b]))
   const hasData = chartData.some((c) => c.a > 0 || c.b > 0)
   const md = (s: string) => { const p = String(s).split('-'); return p.length === 3 ? `${+p[1]}/${+p[2]}` : s }
+  const relPath = (u: string) => { try { return new URL(u).pathname } catch { return u } }
   const maxCountry = Math.max(1, ...((d?.topCountries || []).map((c: any) => c.users)))
   const rangeLabel = RANGES.find((r) => r[0] === range)?.[1] || 'Last 30 Days'
   const metricLabel = METRICS.find((m) => m[0] === metric)?.[1] || 'Daily Active Users'
@@ -205,6 +206,56 @@ export default function AdminDashboard() {
                     <div className="flex items-center justify-between mb-1"><span className="text-sm font-medium" style={{ color: C.text }}>{c.name}</span><span className="text-sm font-semibold" style={{ color: C.muted }}>{c.users.toLocaleString()}</span></div>
                     <div className="w-full h-1.5 rounded-full overflow-hidden" style={{ background: C.bg }}><div className="h-full rounded-full" style={{ width: `${(c.users / maxCountry) * 100}%`, background: C.accent }} /></div>
                   </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Search Console: top keywords + pages */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="rounded-2xl p-6" style={card}>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="flex items-center gap-2 text-base font-semibold" style={{ color: C.text }}><Search size={17} style={{ color: C.accent }} /> Top 25 Search Keywords</h2>
+            <span className="text-xs" style={{ color: C.faint }}>Google Search Console</span>
+          </div>
+          {(d?.searchKeywords || []).length === 0 ? (
+            <p className="py-8 text-center text-sm" style={{ color: C.faint }}>No search data yet.</p>
+          ) : (
+            <div>
+              <div className="grid grid-cols-12 gap-2 pb-2 text-[11px] font-semibold uppercase tracking-wide" style={{ color: C.faint, borderBottom: `1px solid ${C.border}` }}>
+                <span className="col-span-6">Keyword</span><span className="col-span-2 text-right">Clicks</span><span className="col-span-2 text-right">Impr.</span><span className="col-span-2 text-right">Pos.</span>
+              </div>
+              {d.searchKeywords.map((k: any, i: number) => (
+                <div key={i} className="grid grid-cols-12 gap-2 py-2 items-center text-sm" style={{ borderBottom: i < d.searchKeywords.length - 1 ? `1px solid ${C.border}` : 'none' }}>
+                  <span className="col-span-6 truncate" style={{ color: C.text }} title={k.key}>{k.key}</span>
+                  <span className="col-span-2 text-right font-semibold" style={{ color: C.accent }}>{k.clicks}</span>
+                  <span className="col-span-2 text-right" style={{ color: C.muted }}>{(k.impressions || 0).toLocaleString()}</span>
+                  <span className="col-span-2 text-right" style={{ color: C.muted }}>{(k.position || 0).toFixed(1)}</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+        <div className="rounded-2xl p-6" style={card}>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="flex items-center gap-2 text-base font-semibold" style={{ color: C.text }}><Sparkles size={17} style={{ color: C.accent }} /> Top 25 Search Pages</h2>
+            <span className="text-xs" style={{ color: C.faint }}>by clicks</span>
+          </div>
+          {(d?.searchPages || []).length === 0 ? (
+            <p className="py-8 text-center text-sm" style={{ color: C.faint }}>No search data yet.</p>
+          ) : (
+            <div>
+              <div className="grid grid-cols-12 gap-2 pb-2 text-[11px] font-semibold uppercase tracking-wide" style={{ color: C.faint, borderBottom: `1px solid ${C.border}` }}>
+                <span className="col-span-6">Page</span><span className="col-span-2 text-right">Clicks</span><span className="col-span-2 text-right">Impr.</span><span className="col-span-2 text-right">Pos.</span>
+              </div>
+              {d.searchPages.map((k: any, i: number) => (
+                <div key={i} className="grid grid-cols-12 gap-2 py-2 items-center text-sm" style={{ borderBottom: i < d.searchPages.length - 1 ? `1px solid ${C.border}` : 'none' }}>
+                  <span className="col-span-6 truncate font-mono text-xs" style={{ color: C.text }} title={k.key}>{relPath(k.key)}</span>
+                  <span className="col-span-2 text-right font-semibold" style={{ color: C.accent }}>{k.clicks}</span>
+                  <span className="col-span-2 text-right" style={{ color: C.muted }}>{(k.impressions || 0).toLocaleString()}</span>
+                  <span className="col-span-2 text-right" style={{ color: C.muted }}>{(k.position || 0).toFixed(1)}</span>
                 </div>
               ))}
             </div>

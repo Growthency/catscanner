@@ -7,11 +7,13 @@ import { ADMIN as C } from '@/lib/admin-theme'
 import { POST_CATEGORIES, EMPTY_POST, slugify, DEFAULT_AUTHOR_PHOTO, type Post } from '@/lib/posts'
 import RichTextEditor from './RichTextEditor'
 import ImageUpload from './ImageUpload'
-import { ArrowLeft, Save, Send, Search, Loader2, X, Plus } from 'lucide-react'
+import { ArrowLeft, Save, Send, Search, Loader2, X, Plus, Code2, Braces, Link2 } from 'lucide-react'
 
 const cardStyle = { background: C.card, border: `1px solid ${C.border}` }
 const labelStyle = { color: C.text }
 const inputStyle = { background: C.card, border: `1px solid ${C.border}`, color: C.text }
+
+function isValidJson(s?: string): boolean { try { JSON.parse(s || ''); return true } catch { return false } }
 
 function Field({ label, hint, children }: { label: string; hint?: string; children: React.ReactNode }) {
   return (
@@ -32,6 +34,7 @@ export default function PageEditor({ postId }: { postId?: string }) {
   const [error, setError] = useState<string | null>(null)
   const [categories, setCategories] = useState<string[]>(POST_CATEGORIES)
   const [newCat, setNewCat] = useState('')
+  const [allPosts, setAllPosts] = useState<{ id: string; title: string; slug: string }[]>([])
 
   const set = useCallback((patch: Partial<Post>) => setForm((f) => ({ ...f, ...patch })), [])
 
@@ -73,6 +76,18 @@ export default function PageEditor({ postId }: { postId?: string }) {
     persistCategories(next)
     if (form.category === c) set({ category: next[0] || '' })
   }
+
+  // Load other posts to power the interlink checker.
+  useEffect(() => {
+    ;(async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession()
+        const res = await fetch('/api/admin/posts', { headers: { Authorization: `Bearer ${session?.access_token}` } })
+        const j = await res.json()
+        if (Array.isArray(j.posts)) setAllPosts(j.posts.map((p: any) => ({ id: p.id, title: p.title, slug: p.slug })))
+      } catch {}
+    })()
+  }, [])
 
   // Load existing post when editing.
   useEffect(() => {
@@ -116,6 +131,15 @@ export default function PageEditor({ postId }: { postId?: string }) {
     if (!res.ok) { setError(data.error || 'Save failed.'); return }
     router.push('/admin/pages')
   }
+
+  // Internal-link opportunities: other posts whose title appears in this
+  // content but isn't linked yet.
+  const interlinks = (() => {
+    const html = form.content || ''
+    const plain = html.replace(/<[^>]+>/g, ' ').toLowerCase()
+    if (plain.trim().length < 30) return []
+    return allPosts.filter((p) => p.id !== postId && p.title && p.slug && plain.includes(p.title.toLowerCase()) && !html.includes(`/${p.slug}`)).slice(0, 12)
+  })()
 
   if (loading) {
     return <div className="flex items-center justify-center py-24" style={{ color: C.muted }}><Loader2 className="animate-spin" /></div>
@@ -176,6 +200,7 @@ export default function PageEditor({ postId }: { postId?: string }) {
               <input value={form.featured_image || ''} onChange={(e) => set({ featured_image: e.target.value })} placeholder="/image.webp or https://…"
                 className="flex-1 px-4 py-2.5 rounded-lg outline-none text-sm" style={inputStyle} />
               <ImageUpload onUploaded={(url) => set({ featured_image: url })} />
+              {form.featured_image && <button type="button" onClick={() => set({ featured_image: '' })} title="Remove image" className="shrink-0 px-3 rounded-lg flex items-center justify-center" style={{ border: `1px solid ${C.border}`, color: '#ef4444' }}><X size={16} /></button>}
             </div>
             <p className="text-xs mt-1" style={{ color: C.faint }}>Any upload is auto-converted to WebP. Leave empty for a default cover.</p>
             {form.featured_image && (
@@ -186,6 +211,27 @@ export default function PageEditor({ postId }: { postId?: string }) {
           <div className="rounded-2xl p-5" style={cardStyle}>
             <label className="block text-sm font-medium mb-2" style={labelStyle}>Content</label>
             <RichTextEditor value={form.content || ''} onChange={(html) => set({ content: html })} />
+          </div>
+
+          {/* Custom CSS */}
+          <div className="rounded-2xl p-5" style={cardStyle}>
+            <h3 className="flex items-center gap-1.5 text-sm font-semibold mb-1" style={labelStyle}><Code2 size={14} style={{ color: C.accent }} /> Custom CSS</h3>
+            <p className="text-xs mb-2" style={{ color: C.faint }}>Loads only on this page, after the global CSS so your rules win.</p>
+            <textarea value={form.custom_css || ''} onChange={(e) => set({ custom_css: e.target.value })} spellCheck={false} rows={5}
+              placeholder={'/* Example */\n.post-body h2 { color: #f97316; }'}
+              className="w-full px-3 py-2 rounded-lg outline-none font-mono text-xs" style={{ ...inputStyle, resize: 'vertical' }} />
+          </div>
+
+          {/* Custom Schema (JSON-LD) */}
+          <div className="rounded-2xl p-5" style={cardStyle}>
+            <h3 className="flex items-center gap-1.5 text-sm font-semibold mb-1" style={labelStyle}><Braces size={14} style={{ color: C.accent }} /> Custom Schema (JSON-LD)</h3>
+            <p className="text-xs mb-2" style={{ color: C.faint }}>If set, replaces the default Article schema. Use for HowTo, FAQPage, Recipe, Product, etc.</p>
+            <textarea value={form.custom_schema || ''} onChange={(e) => set({ custom_schema: e.target.value })} spellCheck={false} rows={6}
+              placeholder={'{\n  "@context": "https://schema.org",\n  "@type": "FAQPage"\n}'}
+              className="w-full px-3 py-2 rounded-lg outline-none font-mono text-xs" style={{ ...inputStyle, resize: 'vertical' }} />
+            {!!form.custom_schema?.trim() && !isValidJson(form.custom_schema) && (
+              <p className="text-xs mt-1" style={{ color: '#ef4444' }}>⚠ Not valid JSON yet — it won’t be used until it parses.</p>
+            )}
           </div>
         </div>
 
@@ -204,6 +250,24 @@ export default function PageEditor({ postId }: { postId?: string }) {
               <input type="checkbox" checked={!!form.featured} onChange={(e) => set({ featured: e.target.checked })} />
               Feature on homepage / blog hero
             </label>
+          </div>
+
+          {/* Interlink Checker */}
+          <div className="rounded-2xl p-5" style={cardStyle}>
+            <h3 className="flex items-center gap-1.5 text-sm font-semibold mb-2" style={labelStyle}><Link2 size={14} style={{ color: C.accent }} /> Interlink Checker</h3>
+            {interlinks.length === 0 ? (
+              <p className="text-xs" style={{ color: C.faint }}>{(form.content || '').replace(/<[^>]+>/g, '').trim().length < 30 ? 'Start writing to see interlink suggestions.' : 'No internal link opportunities found yet.'}</p>
+            ) : (
+              <div className="space-y-2">
+                <p className="text-xs mb-1" style={{ color: C.muted }}>{interlinks.length} internal link {interlinks.length === 1 ? 'opportunity' : 'opportunities'}:</p>
+                {interlinks.map((p) => (
+                  <div key={p.id} className="text-xs rounded-lg px-2.5 py-2" style={{ background: C.bg, border: `1px solid ${C.border}` }}>
+                    <p className="font-medium truncate" style={{ color: C.text }}>{p.title}</p>
+                    <p className="font-mono truncate" style={{ color: C.accent }}>/{p.slug}</p>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* SEO */}
@@ -231,11 +295,11 @@ export default function PageEditor({ postId }: { postId?: string }) {
           <div className="rounded-2xl p-5 space-y-4" style={cardStyle}>
             <h3 className="text-sm font-semibold" style={labelStyle}>Author</h3>
             <Field label="Name">
-              <input value={form.author_name || ''} onChange={(e) => set({ author_name: e.target.value })} placeholder="Dr. Marcus Bennett"
+              <input value={form.author_name || ''} onChange={(e) => set({ author_name: e.target.value })} placeholder="Marcus Bennett"
                 className="w-full px-3 py-2.5 rounded-lg outline-none text-sm" style={inputStyle} />
             </Field>
             <Field label="Role">
-              <input value={form.author_role || ''} onChange={(e) => set({ author_role: e.target.value })} placeholder="Feline Specialist"
+              <input value={form.author_role || ''} onChange={(e) => set({ author_role: e.target.value })} placeholder="Cat Specialist"
                 className="w-full px-3 py-2.5 rounded-lg outline-none text-sm" style={inputStyle} />
             </Field>
             <div>
@@ -245,8 +309,9 @@ export default function PageEditor({ postId }: { postId?: string }) {
                 <input value={form.author_photo || ''} onChange={(e) => set({ author_photo: e.target.value })} placeholder="Photo URL"
                   className="flex-1 px-3 py-2 rounded-lg outline-none text-sm" style={inputStyle} />
                 <ImageUpload onUploaded={(url) => set({ author_photo: url })} label="" />
+                {form.author_photo && <button type="button" onClick={() => set({ author_photo: '' })} title="Remove photo" className="shrink-0 w-9 h-9 flex items-center justify-center rounded-lg" style={{ border: `1px solid ${C.border}`, color: '#ef4444' }}><X size={15} /></button>}
               </div>
-              <p className="text-xs mt-1" style={{ color: C.faint }}>Empty = default author photo (Dr. Marcus Bennett).</p>
+              <p className="text-xs mt-1" style={{ color: C.faint }}>Empty = default author photo (Marcus Bennett).</p>
             </div>
           </div>
 

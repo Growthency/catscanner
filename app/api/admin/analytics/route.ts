@@ -79,8 +79,19 @@ export async function GET(req: NextRequest) {
       return (d.rows || []).map((row: any) => ({ date: row.keys[0], value: num(row.clicks) }))
     } catch { return null }
   }
+  async function searchConsoleTop(dimension: 'query' | 'page') {
+    try {
+      const r = await fetch(`https://www.googleapis.com/webmasters/v3/sites/${encodeURIComponent(site)}/searchAnalytics/query`, {
+        method: 'POST', headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ startDate: dr.startDate, endDate: dr.endDate, dimensions: [dimension], rowLimit: 25 }),
+      })
+      if (!r.ok) return []
+      const d = await r.json()
+      return (d.rows || []).map((row: any) => ({ key: row.keys[0], clicks: num(row.clicks), impressions: num(row.impressions), ctr: row.ctr || 0, position: row.position || 0 }))
+    } catch { return [] }
+  }
 
-  const [summary, today, seven, usersChart, pages, countries, clicksChart] = await Promise.all([
+  const [summary, today, seven, usersChart, pages, countries, clicksChart, searchKeywords, searchPages] = await Promise.all([
     ga({ dateRanges: [dr], metrics: [{ name: 'activeUsers' }, { name: 'newUsers' }, { name: 'sessions' }, { name: 'screenPageViews' }] }),
     ga({ dateRanges: [{ startDate: 'today', endDate: 'today' }], metrics: [{ name: 'activeUsers' }] }),
     ga({ dateRanges: [{ startDate: iso(new Date(Date.now() - 7 * 86400000)), endDate: iso(new Date()) }], metrics: [{ name: 'activeUsers' }] }),
@@ -88,6 +99,8 @@ export async function GET(req: NextRequest) {
     ga({ dateRanges: [dr], dimensions: [{ name: 'pagePath' }], metrics: [{ name: 'screenPageViews' }], orderBys: [{ metric: { metricName: 'screenPageViews' }, desc: true }], limit: 25 }),
     ga({ dateRanges: [dr], dimensions: [{ name: 'country' }], metrics: [{ name: 'activeUsers' }], orderBys: [{ metric: { metricName: 'activeUsers' }, desc: true }], limit: 25 }),
     searchConsoleDaily(),
+    searchConsoleTop('query'),
+    searchConsoleTop('page'),
   ])
 
   if (!summary) {
@@ -104,5 +117,7 @@ export async function GET(req: NextRequest) {
     clicksChart: buildSeries(clicksChart || [], dr.startDate, dr.endDate),
     topPages: (pages?.rows || []).map((row: any) => ({ path: row.dimensionValues[0].value, views: num(row.metricValues[0].value) })),
     topCountries: (countries?.rows || []).map((row: any) => ({ name: row.dimensionValues[0].value, users: num(row.metricValues[0].value) })),
+    searchKeywords: searchKeywords || [],
+    searchPages: searchPages || [],
   })
 }

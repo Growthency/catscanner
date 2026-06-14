@@ -17,6 +17,8 @@ export type Post = {
   featured: boolean
   read_time: string
   views: number
+  custom_css?: string
+  custom_schema?: string
   publish_date: string | null
   created_at: string
   updated_at: string
@@ -27,8 +29,8 @@ export const POST_CATEGORIES = ['Guide', 'Breeds', 'Health', 'Insights', 'Techno
 // Default author persona shown on posts that don't set their own author.
 // Photo is a copyright-safe AI-generated portrait (a person who does not exist).
 export const DEFAULT_AUTHOR_PHOTO = '/author-avatar.webp'
-export const DEFAULT_AUTHOR_NAME = 'Dr. Marcus Bennett'
-export const DEFAULT_AUTHOR_ROLE = 'Feline Specialist'
+export const DEFAULT_AUTHOR_NAME = 'Marcus Bennett'
+export const DEFAULT_AUTHOR_ROLE = 'Cat Specialist'
 
 export const EMPTY_POST: Partial<Post> = {
   title: '',

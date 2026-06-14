@@ -3,11 +3,12 @@ import { useRef, useEffect, useState } from 'react'
 import { ADMIN as C } from '@/lib/admin-theme'
 import {
   Bold, Italic, Underline, Strikethrough, List, ListOrdered,
-  Link2, Heading2, Heading3, Heading4, Pilcrow, Code, Image as ImageIcon, Quote,
+  Link2, Heading2, Heading3, Heading4, Pilcrow, Code, Image as ImageIcon, Quote, Upload,
 } from 'lucide-react'
 
 export default function RichTextEditor({ value, onChange }: { value: string; onChange: (html: string) => void }) {
   const ref = useRef<HTMLDivElement>(null)
+  const fileRef = useRef<HTMLInputElement>(null)
   const [showHtml, setShowHtml] = useState(false)
 
   // Seed the editor with the initial/loaded HTML (runs on mount and when toggling back from HTML view).
@@ -22,6 +23,20 @@ export default function RichTextEditor({ value, onChange }: { value: string; onC
     document.execCommand(cmd, false, arg)
     if (ref.current) onChange(ref.current.innerHTML)
     ref.current?.focus()
+  }
+
+  // Load a raw .html file straight into the editor content.
+  function uploadHtml(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    const reader = new FileReader()
+    reader.onload = () => {
+      const text = String(reader.result || '')
+      onChange(text)
+      if (ref.current && !showHtml) ref.current.innerHTML = text
+    }
+    reader.readAsText(file)
+    e.target.value = ''
   }
 
   function Btn({ onClick, title, children }: { onClick: () => void; title: string; children: React.ReactNode }) {
@@ -62,6 +77,16 @@ export default function RichTextEditor({ value, onChange }: { value: string; onC
         <Btn title="Insert link" onClick={() => { const url = window.prompt('Link URL:'); if (url) exec('createLink', url) }}><Link2 size={16} /></Btn>
         <Btn title="Insert image" onClick={() => { const url = window.prompt('Image URL:'); if (url) exec('insertImage', url) }}><ImageIcon size={16} /></Btn>
         <span style={{ flex: 1 }} />
+        <input ref={fileRef} type="file" accept=".html,.htm,text/html" onChange={uploadHtml} style={{ display: 'none' }} />
+        <button
+          type="button"
+          onClick={() => fileRef.current?.click()}
+          title="Upload an HTML file"
+          className="flex items-center gap-1 px-2 h-8 rounded text-xs font-medium transition-colors"
+          style={{ color: C.muted }}
+        >
+          <Upload size={14} /> HTML file
+        </button>
         <button
           type="button"
           onClick={() => setShowHtml((s) => !s)}

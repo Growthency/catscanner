@@ -110,9 +110,28 @@ export default async function ArticlePage({ params }: { params: { slug: string }
   const { popular, recent } = await getRelated(post.slug)
   const updated = post.updated_at && post.updated_at !== post.created_at ? post.updated_at : (post.publish_date || post.created_at)
 
+  const defaultSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: post.meta_title || post.title,
+    description: post.meta_description || post.excerpt || undefined,
+    image: post.featured_image ? [post.featured_image] : undefined,
+    datePublished: post.publish_date || post.created_at,
+    dateModified: updated,
+    author: { '@type': 'Person', name: post.author_name || DEFAULT_AUTHOR_NAME },
+    publisher: { '@type': 'Organization', name: 'CatScanner', logo: { '@type': 'ImageObject', url: 'https://catscanner.org/icon.svg' } },
+    mainEntityOfPage: { '@type': 'WebPage', '@id': `https://catscanner.org/${post.slug}` },
+  }
+  let schemaJson = JSON.stringify(defaultSchema)
+  if (post.custom_schema && post.custom_schema.trim()) {
+    try { JSON.parse(post.custom_schema); schemaJson = post.custom_schema } catch {}
+  }
+
   return (
     <div style={{ background: 'var(--bg-primary)', minHeight: '100vh', paddingTop: '84px' }}>
       <ViewTracker slug={post.slug} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: schemaJson }} />
+      {post.custom_css ? <style dangerouslySetInnerHTML={{ __html: post.custom_css }} /> : null}
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-10">
         {/* ── MAIN ── */}
         <article className="lg:col-span-2 min-w-0">
