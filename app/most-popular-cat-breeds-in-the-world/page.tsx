@@ -1,976 +1,276 @@
 import type { Metadata } from 'next'
-import Link from 'next/link'
-import Script from 'next/script'
+import ArticleView from '@/components/ArticleView'
+
+const SLUG = 'most-popular-cat-breeds-in-the-world'
+const TITLE = 'Which Cat Breed is #1? Top 10 Most Popular Cats Globally'
+const DESCRIPTION = 'Is your favorite feline on the list? Check out the most popular cat breeds in the world right now, featuring the gentle Maine Coon, the vocal Siamese, and more.'
+const IMAGE = '/most-popular-cat-breeds-in-the-world.webp'
 
 export const metadata: Metadata = {
-  title: 'Which Cat Breed is #1? Top 10 Most Popular Cats Globally',
-  description: 'Is your favorite feline on the list? Check out the most popular cat breeds in the world right now, featuring the gentle Maine Coon, the vocal Siamese, and more.',
+  title: TITLE,
+  description: DESCRIPTION,
+  alternates: { canonical: `/${SLUG}` },
+  openGraph: { title: TITLE, description: DESCRIPTION, url: `https://catscanner.org/${SLUG}`, type: 'article', images: [IMAGE] },
+  twitter: { card: 'summary_large_image', title: TITLE, description: DESCRIPTION, images: [IMAGE] },
 }
 
-const schema = {
-  "@context": "https://schema.org",
-  "@graph": [
+const SCHEMA = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@graph': [
     {
-      "@type": "Article",
-      "@id": "https://catscanner.org/most-popular-cat-breeds-in-the-world/#article",
-      "headline": "Top 10 Most Popular Cat Breeds in the World",
-      "description": "Explore the top 10 most popular cat breeds in the world, including temperament, size, grooming, and lifestyle fit for cat owners.",
-      "mainEntityOfPage": {
-        "@type": "WebPage",
-        "@id": "https://catscanner.org/most-popular-cat-breeds-in-the-world/"
-      },
-      "about": [
-        { "@type": "Thing", "name": "Most Popular Cat Breeds" },
-        { "@type": "Thing", "name": "Domestic Cat" },
-        { "@type": "Thing", "name": "Persian Cat" },
-        { "@type": "Thing", "name": "Maine Coon" },
-        { "@type": "Thing", "name": "Siamese Cat" },
-        { "@type": "Thing", "name": "Ragdoll" },
-        { "@type": "Thing", "name": "Bengal Cat" },
-        { "@type": "Thing", "name": "British Shorthair" },
-        { "@type": "Thing", "name": "Sphynx Cat" },
-        { "@type": "Thing", "name": "Scottish Fold" },
-        { "@type": "Thing", "name": "Russian Blue" },
-        { "@type": "Thing", "name": "Abyssinian" }
-      ],
-      "author": { "@type": "Organization", "name": "CatScanner", "url": "https://catscanner.org/" },
-      "publisher": {
-        "@type": "Organization",
-        "name": "CatScanner",
-        "url": "https://catscanner.org/",
-        "logo": { "@type": "ImageObject", "url": "https://catscanner.org/icon.svg" }
-      },
-      "datePublished": "2026-03-26",
-      "dateModified": "2026-03-26",
-      "inLanguage": "en",
-      "keywords": ["top 10 most popular cat breeds in the world", "most popular cat breeds", "best cat breeds", "friendly cat breeds", "indoor cats", "cat breed comparison"]
+      '@type': 'Article',
+      '@id': `https://catscanner.org/${SLUG}#article`,
+      headline: 'Top 10 Most Popular Cat Breeds in the World',
+      description: 'Explore the top 10 most popular cat breeds in the world, including temperament, size, grooming, and lifestyle fit for cat owners.',
+      mainEntityOfPage: { '@type': 'WebPage', '@id': `https://catscanner.org/${SLUG}` },
+      about: ['Most Popular Cat Breeds', 'Domestic Cat', 'Persian Cat', 'Maine Coon', 'Siamese Cat', 'Ragdoll', 'Bengal Cat', 'British Shorthair', 'Sphynx Cat', 'Scottish Fold', 'Russian Blue', 'Abyssinian'].map((name) => ({ '@type': 'Thing', name })),
+      image: [`https://catscanner.org${IMAGE}`],
+      author: { '@type': 'Organization', name: 'CatScanner', url: 'https://catscanner.org/' },
+      publisher: { '@type': 'Organization', name: 'CatScanner', url: 'https://catscanner.org/', logo: { '@type': 'ImageObject', url: 'https://catscanner.org/icon.svg' } },
+      datePublished: '2026-03-26',
+      dateModified: '2026-03-26',
+      inLanguage: 'en',
+      keywords: ['top 10 most popular cat breeds in the world', 'most popular cat breeds', 'best cat breeds', 'friendly cat breeds', 'indoor cats', 'cat breed comparison'],
     },
     {
-      "@type": "FAQPage",
-      "@id": "https://catscanner.org/most-popular-cat-breeds-in-the-world/#faq",
-      "mainEntity": [
-        {
-          "@type": "Question",
-          "name": "What is \"I love you\" in cat language?",
-          "acceptedAnswer": { "@type": "Answer", "text": "Cats show affection through behavior such as slow blinking, purring, rubbing against you, and staying close. A slow blink is often seen as a cat's way of showing trust and love." }
-        },
-        {
-          "@type": "Question",
-          "name": "What are 7 big cats?",
-          "acceptedAnswer": { "@type": "Answer", "text": "The term big cats often includes lion, tiger, leopard, jaguar, snow leopard, cheetah, and cougar. These are wild felines and are different from domestic cat breeds." }
-        },
-        {
-          "@type": "Question",
-          "name": "What Is the Friendliest Cat Breed?",
-          "acceptedAnswer": { "@type": "Answer", "text": "Some of the friendliest cat breeds include Ragdoll, Maine Coon, and Siamese. They are known for affectionate, social, and people-oriented behavior." }
-        },
-        {
-          "@type": "Question",
-          "name": "What Is the Most Popular Cat Breed?",
-          "acceptedAnswer": { "@type": "Answer", "text": "The most popular cat breeds often include Persian Cat, Maine Coon, and British Shorthair because of their appearance, temperament, and suitability as pets." }
-        },
-        {
-          "@type": "Question",
-          "name": "What is the #1 cutest cat?",
-          "acceptedAnswer": { "@type": "Answer", "text": "Cutest is subjective, but Persian, Scottish Fold, and Ragdoll are often considered among the cutest cat breeds because of their soft coats, round faces, and expressive looks." }
-        },
-        {
-          "@type": "Question",
-          "name": "Who are the big 5 cats?",
-          "acceptedAnswer": { "@type": "Answer", "text": "If people mean the five most famous big wild cats, they usually refer to lion, tiger, leopard, jaguar, and cheetah." }
-        },
-        {
-          "@type": "Question",
-          "name": "Which cat is the king of cats?",
-          "acceptedAnswer": { "@type": "Answer", "text": "The lion is widely known as the king of cats because of its strength, dominance, and symbolic status among wild felines." }
-        },
-        {
-          "@type": "Question",
-          "name": "What is the #1 killer of cats?",
-          "acceptedAnswer": { "@type": "Answer", "text": "For domestic cats, common leading causes of death include kidney disease, cancer, infections, and accidents, especially in outdoor cats. Regular veterinary care helps reduce risk." }
-        }
-      ]
-    }
-  ]
-}
+      '@type': 'FAQPage',
+      '@id': `https://catscanner.org/${SLUG}#faq`,
+      mainEntity: [
+        { '@type': 'Question', name: 'What is "I love you" in cat language?', acceptedAnswer: { '@type': 'Answer', text: "Cats show affection through behavior such as slow blinking, purring, rubbing against you, and staying close. A slow blink is often seen as a cat's way of showing trust and love." } },
+        { '@type': 'Question', name: 'What are 7 big cats?', acceptedAnswer: { '@type': 'Answer', text: 'The term big cats often includes lion, tiger, leopard, jaguar, snow leopard, cheetah, and cougar. These are wild felines and are different from domestic cat breeds.' } },
+        { '@type': 'Question', name: 'What Is the Friendliest Cat Breed?', acceptedAnswer: { '@type': 'Answer', text: 'Some of the friendliest cat breeds include Ragdoll, Maine Coon, and Siamese. They are known for affectionate, social, and people-oriented behavior.' } },
+        { '@type': 'Question', name: 'What Is the Most Popular Cat Breed?', acceptedAnswer: { '@type': 'Answer', text: 'The most popular cat breeds often include Persian Cat, Maine Coon, and British Shorthair because of their appearance, temperament, and suitability as pets.' } },
+        { '@type': 'Question', name: 'What is the #1 cutest cat?', acceptedAnswer: { '@type': 'Answer', text: 'Cutest is subjective, but Persian, Scottish Fold, and Ragdoll are often considered among the cutest cat breeds because of their soft coats, round faces, and expressive looks.' } },
+        { '@type': 'Question', name: 'Who are the big 5 cats?', acceptedAnswer: { '@type': 'Answer', text: 'If people mean the five most famous big wild cats, they usually refer to lion, tiger, leopard, jaguar, and cheetah.' } },
+        { '@type': 'Question', name: 'Which cat is the king of cats?', acceptedAnswer: { '@type': 'Answer', text: 'The lion is widely known as the king of cats because of its strength, dominance, and symbolic status among wild felines.' } },
+        { '@type': 'Question', name: 'What is the #1 killer of cats?', acceptedAnswer: { '@type': 'Answer', text: 'For domestic cats, common leading causes of death include kidney disease, cancer, infections, and accidents, especially in outdoor cats. Regular veterinary care helps reduce risk.' } },
+      ],
+    },
+  ],
+})
 
-const TOP_10 = [
-  'Persian Cat', 'Maine Coon', 'Siamese Cat', 'Ragdoll', 'Bengal Cat',
-  'British Shorthair', 'Sphynx Cat', 'Scottish Fold', 'Russian Blue', 'Abyssinian',
-]
+const CONTENT = `
+<p>The most popular cat breeds in the world are usually the ones that combine strong looks, appealing temperament, and practical pet-owner fit. Breeds like the <strong>Persian Cat</strong>, <strong>Maine Coon</strong>, <strong>Siamese Cat</strong>, <strong>Ragdoll</strong>, <strong>Bengal Cat</strong>, <strong>British Shorthair</strong>, <strong>Sphynx Cat</strong>, <strong>Scottish Fold</strong>, <strong>Russian Blue</strong>, and <strong>Abyssinian</strong> are widely recognized because they stand out in appearance, personality, and adaptability as domestic cats.</p>
+<p>If you are comparing the top 10 cat breeds, this guide explains what makes each one popular, how they differ, and which type of feline may suit your home, lifestyle, and care expectations best. Once you know the breed, use our <a href="/">AI Cat Breed Identifier</a> to scan your own cat instantly.</p>
 
-const OVERVIEW_TABLE = [
-  { breed: 'Persian', coat: 'Long-haired', energy: 'Low to moderate', grooming: 'High', appeal: 'Beauty, calmness' },
-  { breed: 'Maine Coon', coat: 'Long-haired', energy: 'Moderate', grooming: 'Moderate to high', appeal: 'Friendly giant' },
-  { breed: 'Siamese', coat: 'Short-haired', energy: 'High', grooming: 'Low', appeal: 'Social, expressive' },
-  { breed: 'Ragdoll', coat: 'Semi-long', energy: 'Low to moderate', grooming: 'Moderate', appeal: 'Gentle companion' },
-  { breed: 'Bengal', coat: 'Short-haired', energy: 'High', grooming: 'Low', appeal: 'Exotic look, activity' },
-  { breed: 'British Shorthair', coat: 'Short-haired', energy: 'Low to moderate', grooming: 'Low', appeal: 'Easygoing pet' },
-  { breed: 'Sphynx', coat: 'Hairless', energy: 'Moderate to high', grooming: 'Moderate', appeal: 'Unique appearance' },
-  { breed: 'Scottish Fold', coat: 'Short/long', energy: 'Moderate', grooming: 'Moderate', appeal: 'Distinctive ears' },
-  { breed: 'Russian Blue', coat: 'Short-haired', energy: 'Moderate', grooming: 'Low', appeal: 'Quiet elegance' },
-  { breed: 'Abyssinian', coat: 'Short-haired', energy: 'High', grooming: 'Low', appeal: 'Athletic, intelligent' },
-]
+<h2>Top 10 Most Popular Cat Breeds in the World</h2>
+<p>Popularity in cats is not just about beauty. A breed becomes widely loved when it consistently appears in homes, breed registries, adoption searches, online interest, and pet-owner recommendations. In other words, "popular" usually reflects a mix of global visibility, demand, temperament, care fit, and recognizability.</p>
+<p>The top 10 most popular cat breeds typically include:</p>
+<ol>
+<li>Persian Cat</li><li>Maine Coon</li><li>Siamese Cat</li><li>Ragdoll</li><li>Bengal Cat</li><li>British Shorthair</li><li>Sphynx Cat</li><li>Scottish Fold</li><li>Russian Blue</li><li>Abyssinian</li>
+</ol>
+<p>These breeds are all domestic cats, but they are popular for different reasons. Some are known for luxurious coats, some for affectionate behavior, some for intelligence and playfulness, and others for low-maintenance care or apartment-friendly living.</p>
 
-const SIZE_TABLE = [
-  { breed: 'Persian', size: 'Medium', lifespan: '12–17 years', temperament: 'Calm, gentle' },
-  { breed: 'Maine Coon', size: 'Large', lifespan: '12–15 years', temperament: 'Friendly, social' },
-  { breed: 'Siamese', size: 'Medium', lifespan: '12–20 years', temperament: 'Vocal, active' },
-  { breed: 'Ragdoll', size: 'Large', lifespan: '12–15 years', temperament: 'Affectionate, relaxed' },
-  { breed: 'Bengal', size: 'Medium', lifespan: '12–16 years', temperament: 'Energetic, curious' },
-  { breed: 'British Shorthair', size: 'Medium', lifespan: '12–20 years', temperament: 'Calm, independent' },
-  { breed: 'Sphynx', size: 'Medium', lifespan: '8–14 years', temperament: 'Social, playful' },
-  { breed: 'Scottish Fold', size: 'Medium', lifespan: '11–15 years', temperament: 'Gentle, quiet' },
-  { breed: 'Russian Blue', size: 'Medium', lifespan: '15–20 years', temperament: 'Intelligent, reserved' },
-  { breed: 'Abyssinian', size: 'Medium', lifespan: '12–15 years', temperament: 'Active, playful' },
-]
+<p><img src="/most-popular-cat-breeds-in-the-world.webp" alt="most popular cat breeds in the world" /></p>
 
-const GROOMING_TABLE = [
-  { breed: 'Persian', coat: 'Long-haired', grooming: 'High' },
-  { breed: 'Maine Coon', coat: 'Long-haired', grooming: 'Moderate–High' },
-  { breed: 'Siamese', coat: 'Short-haired', grooming: 'Low' },
-  { breed: 'Ragdoll', coat: 'Semi-long', grooming: 'Moderate' },
-  { breed: 'Bengal', coat: 'Short-haired', grooming: 'Low' },
-  { breed: 'British Shorthair', coat: 'Short-haired', grooming: 'Low' },
-  { breed: 'Sphynx', coat: 'Hairless', grooming: 'Moderate (skin care)' },
-  { breed: 'Scottish Fold', coat: 'Short/Long', grooming: 'Moderate' },
-  { breed: 'Russian Blue', coat: 'Short-haired', grooming: 'Low' },
-  { breed: 'Abyssinian', coat: 'Short-haired', grooming: 'Low' },
-]
+<h2>What Defines a Popular Cat Breed</h2>
+<p>A popular cat breed usually checks several boxes at once: easy to recognize visually, a strong reputation among cat owners, suitability for home life, an appealing personality or temperament, broad media and social visibility, and a regular presence in pedigree and breed association discussions.</p>
+<p>Popularity can come from different sources. The <strong>Persian Cat</strong> is popular because of its iconic long coat and calm, elegant look; the <strong>Maine Coon</strong> because of its large size, friendly personality, and family-friendly reputation; the <strong>Bengal Cat</strong> stands out for its wild-looking coat pattern and high energy; and the <strong>British Shorthair</strong> remains popular because it is calm, sturdy, and relatively low maintenance. That means popularity is a relationship between appearance, behavior, and everyday livability.</p>
+<h3>Global Cat Popularity Trends</h3>
+<table>
+<thead><tr><th>Trend</th><th>Why It Matters</th></tr></thead>
+<tbody>
+<tr><td>Apartment living</td><td>Increases demand for adaptable indoor cats</td></tr>
+<tr><td>Family pet preferences</td><td>Favors friendly and social breeds</td></tr>
+<tr><td>Grooming expectations</td><td>Influences whether long-haired or short-haired breeds are preferred</td></tr>
+<tr><td>Online visibility</td><td>Popular breeds get more exposure through photos, videos, and social media</td></tr>
+<tr><td>Breed recognition</td><td>Cat associations such as CFA and TICA help formalize breed awareness</td></tr>
+</tbody>
+</table>
+<p>Some breeds perform well globally because they match modern lifestyles. Indoor cats, friendly cat breeds, and low maintenance cats tend to appeal to a wider audience than breeds that need constant attention or highly specialized environments.</p>
 
-const FAQS = [
-  {
-    q: 'What is "I love you" in cat language?',
-    a: 'Cats show love through behavior, not words. Common signs include slow blinking, purring, rubbing against you, and sitting close. A slow blink is often considered a cat\'s way of saying "I trust you."',
-  },
-  {
-    q: 'What are 7 big cats?',
-    a: 'The term big cats usually refers to large wild members of the feline family: Lion, Tiger, Leopard, Jaguar, Snow Leopard, Cheetah, Cougar (Mountain Lion). These are different from domestic cat breeds.',
-  },
-  {
-    q: 'What Is the Friendliest Cat Breed?',
-    a: 'The friendliest cat breeds are typically Ragdoll (very affectionate), Maine Coon (social and gentle), and Siamese (interactive and vocal). They are known for strong human bonding and social behavior.',
-  },
-  {
-    q: 'What Is the Most Popular Cat Breed?',
-    a: 'The most popular cat breeds worldwide often include Persian Cat, Maine Coon, and British Shorthair. Popularity comes from a mix of appearance, temperament, and adaptability.',
-  },
-  {
-    q: 'What is the #1 cutest cat?',
-    a: '"Cutest" is subjective, but commonly loved breeds include Persian (fluffy and round), Scottish Fold (folded ears), and Ragdoll (soft expression). Their facial features and coat make them widely appealing.',
-  },
-  {
-    q: 'Who are the big 5 cats?',
-    a: 'If focusing only on wild cats, it typically means lion, tiger, leopard, jaguar, and cheetah. The safari "Big Five" is a different term that includes non-cat animals like elephant, rhino, and buffalo.',
-  },
-  {
-    q: 'Which cat is the king of cats?',
-    a: 'The lion is known as the "king of cats" because of its strength, dominance, and position at the top of the wild feline hierarchy.',
-  },
-  {
-    q: 'What is the #1 killer of cats?',
-    a: 'For domestic cats, the leading causes of death are kidney disease, cancer, infections and accidents (especially outdoor cats). Regular veterinary care and indoor safety can reduce risks.',
-  },
-]
+<h2>What Makes a Cat Breed Popular</h2>
+<p>Not every beautiful cat becomes one of the most popular cat breeds in the world. Popularity usually comes from a combination of temperament, appearance, care needs, and home compatibility.</p>
+<h3>Temperament and Personality</h3>
+<p>For most pet owners, personality matters just as much as looks. A cat that is affectionate, social, calm, or playful is more likely to earn long-term popularity. Key traits include affection level, social behavior, energy level, intelligence, playfulness, and calmness.</p>
+<ul><li><strong>Ragdoll cats</strong> are loved for their gentle, affectionate nature.</li><li><strong>Siamese cats</strong> are famous for being vocal, social, and interactive.</li><li><strong>Russian Blue cats</strong> are often appreciated for being intelligent and loyal.</li><li><strong>Abyssinians</strong> attract owners who want an active, curious feline companion.</li></ul>
+<h3>Appearance and Coat Type</h3>
+<p>Visual appeal plays a major role in breed popularity. Some breeds stand out because of their coat, eye color, face shape, or body structure:</p>
+<ul><li><strong>Persian Cat</strong> — luxurious long coat and distinctive face</li><li><strong>Bengal Cat</strong> — spotted or marbled coat pattern</li><li><strong>Sphynx Cat</strong> — hairless appearance</li><li><strong>Siamese Cat</strong> — pointed coat and striking blue eyes</li><li><strong>British Shorthair</strong> — dense plush coat and round build</li></ul>
+<h3>Adaptability for Indoor Living</h3>
+<p>Today, many of the most popular cat breeds are also the best indoor cats. A breed tends to gain popularity when it can adapt to indoor routines, family settings, limited space, regular human interaction, and predictable home environments. This is why users frequently search for "best cat breeds for apartments," "best cat for families," and "best cat breeds for beginners."</p>
+<h3>Maintenance and Grooming Needs</h3>
+<p>Popularity is also shaped by how much work the breed requires. Care-related factors include grooming, shedding level, skin care, nutrition, health monitoring, and veterinary care needs.</p>
+<ul><li>Persian Cats are beautiful, but their long coat means more grooming.</li><li>British Shorthairs and Russian Blues tend to be easier to maintain.</li><li>Sphynx Cats do not shed in the same way, but they need regular skin care.</li><li>Maine Coons have a thick coat, so maintenance matters even though they are widely loved.</li></ul>
 
-export default function MostPopularCatBreedsPage() {
+<h2>Top 10 Cat Breeds List (Quick Overview)</h2>
+<p>Before going breed by breed, it helps to look at the full list in one place.</p>
+<table>
+<thead><tr><th>Breed</th><th>Coat Type</th><th>Energy Level</th><th>Grooming</th><th>Common Appeal</th></tr></thead>
+<tbody>
+<tr><td>Persian</td><td>Long-haired</td><td>Low to moderate</td><td>High</td><td>Beauty, calmness</td></tr>
+<tr><td>Maine Coon</td><td>Long-haired</td><td>Moderate</td><td>Moderate to high</td><td>Friendly giant</td></tr>
+<tr><td>Siamese</td><td>Short-haired</td><td>High</td><td>Low</td><td>Social, expressive</td></tr>
+<tr><td>Ragdoll</td><td>Semi-long</td><td>Low to moderate</td><td>Moderate</td><td>Gentle companion</td></tr>
+<tr><td>Bengal</td><td>Short-haired</td><td>High</td><td>Low</td><td>Exotic look, activity</td></tr>
+<tr><td>British Shorthair</td><td>Short-haired</td><td>Low to moderate</td><td>Low</td><td>Easygoing pet</td></tr>
+<tr><td>Sphynx</td><td>Hairless</td><td>Moderate to high</td><td>Moderate</td><td>Unique appearance</td></tr>
+<tr><td>Scottish Fold</td><td>Short/long</td><td>Moderate</td><td>Moderate</td><td>Distinctive ears</td></tr>
+<tr><td>Russian Blue</td><td>Short-haired</td><td>Moderate</td><td>Low</td><td>Quiet elegance</td></tr>
+<tr><td>Abyssinian</td><td>Short-haired</td><td>High</td><td>Low</td><td>Athletic, intelligent</td></tr>
+</tbody>
+</table>
+
+<h2>1. Persian Cat</h2>
+<p>The Persian Cat is one of the most famous and instantly recognizable cat breeds in the world. Its popularity comes from a mix of beauty, calm temperament, and strong breed identity. When people imagine a luxurious house cat or classic pedigree cat, the Persian is often one of the first images that comes to mind.</p>
+<p><strong>Origin and history:</strong> Persians have long been associated with elegance and formal breed recognition. Their enduring popularity is tied to strong historical recognition, a distinct appearance, broad visibility in media and pet culture, and consistent demand among owners who want a calm indoor cat.</p>
+<p><strong>Physical appearance and coat:</strong> long-haired coat, rounded body, full cheeks, a flat or shorter muzzle, large expressive eyes, and dense, full fur texture.</p>
+<p><strong>Personality and temperament:</strong> calm, gentle, and quiet — the Persian is comfortable in stable indoor settings. It is not the best fit for someone wanting a highly athletic cat, but its charm comes from presence, softness, and calm companionship.</p>
+<p><strong>Grooming and care:</strong> the Persian requires regular brushing to prevent matting, ongoing coat maintenance, and hygiene attention around the face. It is best for owners who understand the grooming commitment.</p>
+
+<h2>2. Maine Coon</h2>
+<p>The Maine Coon is one of the most admired and widely loved cat breeds in the world. It combines size, personality, and a rugged but friendly appearance in a way that appeals to both experienced cat owners and first-time families.</p>
+<p><strong>Size, body structure, and coat:</strong> a large cat breed with strong bone structure, a broad chest, a long body, a thick coat, often tufted ears, and a full tail.</p>
+<p><strong>Personality — the gentle giant:</strong> friendly, social, intelligent, and playful without being overwhelming. The Maine Coon is a great fit for families and balances affection and independence well.</p>
+<table>
+<thead><tr><th>Breed</th><th>Coat</th><th>Grooming</th><th>Temperament</th><th>Best Fit</th></tr></thead>
+<tbody>
+<tr><td>Persian</td><td>Long-haired</td><td>High</td><td>Calm, quiet</td><td>Heavy grooming owners</td></tr>
+<tr><td>Maine Coon</td><td>Long-haired</td><td>Moderate–High</td><td>Friendly, social</td><td>Families, large-cat lovers</td></tr>
+</tbody>
+</table>
+
+<h2>3. Siamese Cat</h2>
+<p>The Siamese Cat is one of the most recognizable and historically popular cat breeds in the world. Its unique combination of appearance, vocal personality, and strong social behavior makes it a standout among domestic cats.</p>
+<p><strong>Coat pattern and eyes:</strong> short-haired coat, a slender athletic build, a color-point pattern, bright blue eyes, and a light body with darker extremities.</p>
+<p><strong>Personality:</strong> very vocal, social and people-oriented, intelligent, seeks attention and interaction, and is great for active households.</p>
+
+<h2>4. Ragdoll</h2>
+<p>The Ragdoll is one of the most loved cat breeds due to its gentle personality and strong indoor adaptability. It is often ranked among the best cat breeds for families. Known for its medium to large body, soft semi-long coat, blue eyes, and relaxed posture — the Ragdoll's popularity comes largely from its temperament: extremely affectionate, calm, enjoys being held, and friendly with people and other pets.</p>
+<p>Ragdolls are highly suited for indoor living with low aggression and good adaptation to apartments. Despite having longer fur, they require only moderate grooming and are less prone to matting than some long-haired breeds.</p>
+
+<h2>5. Bengal Cat</h2>
+<p>The Bengal Cat stands out among the most popular cat breeds because of its wild appearance and high energy level. It is one of the most visually striking domestic cats with its spotted or marbled leopard-like coat pattern and muscular, athletic body.</p>
+<ul><li><strong>Energy</strong> — high energy, loves climbing, needs stimulation</li><li><strong>Intelligence</strong> — highly curious and play-driven, needs interactive toys</li><li><strong>Grooming</strong> — short coat with low shedding maintenance, but needs an active environment</li></ul>
+
+<h2>6. British Shorthair</h2>
+<p>The British Shorthair is one of the most balanced and widely loved cat breeds. Its calm personality, sturdy body, and low maintenance needs make it highly popular worldwide. Known for its dense plush short coat, round face, and compact sturdy body — it is a top choice for quiet homes and apartment living.</p>
+<p>British Shorthairs are calm, independent, and have low vocal behavior. They require minimal grooming with moderate shedding and adapt well to indoor living, smaller spaces, and consistent routines.</p>
+
+<h2>7. Sphynx Cat</h2>
+<p>The Sphynx Cat is one of the most unique and recognizable cat breeds due to its hairless appearance. Its popularity comes from both its distinctive look and its highly affectionate, social personality. Unlike other cats, the Sphynx requires regular skin cleaning, protection from temperature changes, and management of oil buildup — making it a different type of maintenance, not low maintenance.</p>
+<p>Sphynx cats are highly social, attention-seeking, and energetic. They are often searched under "most unique cat breeds" and "hairless cat breeds."</p>
+
+<p><img src="/cat-identifier.webp" alt="most popular cat breeds in the world" /></p>
+
+<h2>Cat Breed Comparison Table</h2>
+<p>A comparison table helps you quickly evaluate differences between the top 10 most popular cat breeds based on key attributes like size, lifespan, temperament, and maintenance.</p>
+<h3>Size, Lifespan, and Temperament</h3>
+<table>
+<thead><tr><th>Breed</th><th>Size</th><th>Lifespan</th><th>Temperament</th></tr></thead>
+<tbody>
+<tr><td>Persian</td><td>Medium</td><td>12–17 years</td><td>Calm, gentle</td></tr>
+<tr><td>Maine Coon</td><td>Large</td><td>12–15 years</td><td>Friendly, social</td></tr>
+<tr><td>Siamese</td><td>Medium</td><td>12–20 years</td><td>Vocal, active</td></tr>
+<tr><td>Ragdoll</td><td>Large</td><td>12–15 years</td><td>Affectionate, relaxed</td></tr>
+<tr><td>Bengal</td><td>Medium</td><td>12–16 years</td><td>Energetic, curious</td></tr>
+<tr><td>British Shorthair</td><td>Medium</td><td>12–20 years</td><td>Calm, independent</td></tr>
+<tr><td>Sphynx</td><td>Medium</td><td>8–14 years</td><td>Social, playful</td></tr>
+<tr><td>Scottish Fold</td><td>Medium</td><td>11–15 years</td><td>Gentle, quiet</td></tr>
+<tr><td>Russian Blue</td><td>Medium</td><td>15–20 years</td><td>Intelligent, reserved</td></tr>
+<tr><td>Abyssinian</td><td>Medium</td><td>12–15 years</td><td>Active, playful</td></tr>
+</tbody>
+</table>
+<h3>Grooming and Maintenance Level</h3>
+<table>
+<thead><tr><th>Breed</th><th>Coat Type</th><th>Grooming Level</th></tr></thead>
+<tbody>
+<tr><td>Persian</td><td>Long-haired</td><td>High</td></tr>
+<tr><td>Maine Coon</td><td>Long-haired</td><td>Moderate–High</td></tr>
+<tr><td>Siamese</td><td>Short-haired</td><td>Low</td></tr>
+<tr><td>Ragdoll</td><td>Semi-long</td><td>Moderate</td></tr>
+<tr><td>Bengal</td><td>Short-haired</td><td>Low</td></tr>
+<tr><td>British Shorthair</td><td>Short-haired</td><td>Low</td></tr>
+<tr><td>Sphynx</td><td>Hairless</td><td>Moderate (skin care)</td></tr>
+<tr><td>Scottish Fold</td><td>Short/Long</td><td>Moderate</td></tr>
+<tr><td>Russian Blue</td><td>Short-haired</td><td>Low</td></tr>
+<tr><td>Abyssinian</td><td>Short-haired</td><td>Low</td></tr>
+</tbody>
+</table>
+<p><strong>Best for families:</strong> Maine Coon, Ragdoll, British Shorthair. <strong>Best for apartments:</strong> British Shorthair, Persian, Russian Blue. <strong>Best for active homes:</strong> Bengal, Abyssinian, Siamese.</p>
+
+<h2>Cat Breed Categories</h2>
+<p>Understanding categories helps simplify decision-making, especially when comparing multiple breeds.</p>
+<h3>Long-Haired Cat Breeds</h3>
+<p>Persian, Maine Coon, Ragdoll, Birman. Best for owners who enjoy grooming and want a soft, luxurious coat.</p>
+<h3>Short-Haired Cat Breeds</h3>
+<p>Siamese, Bengal, British Shorthair, Russian Blue, Abyssinian. Best for low-maintenance grooming and easy care.</p>
+<h3>Hairless Cat Breeds</h3>
+<p>Sphynx. Best for a unique appearance (but requires skin care).</p>
+<h3>Large vs Small Breeds</h3>
+<p>Large: Maine Coon, Ragdoll. Medium: most popular breeds. Smaller: Siamese, Abyssinian. Physical traits connect directly with care and lifestyle choices.</p>
+
+<h2>Best Cat Breeds Based on Lifestyle</h2>
+<p>Choosing the right cat is not just about popularity — it is about matching the breed with your daily life.</p>
+<h3>Best Cat Breeds for Families</h3>
+<p>Maine Coon (friendly and social), Ragdoll (gentle and affectionate), British Shorthair (calm and stable).</p>
+<h3>Best Cat Breeds for Apartments</h3>
+<p>British Shorthair (low energy, quiet), Persian (calm indoor companion), Russian Blue (adaptable and reserved).</p>
+<h3>Low Maintenance Cat Breeds</h3>
+<p>Siamese (easy care), Bengal (simple routines), Abyssinian (minimal grooming), British Shorthair (easy daily care).</p>
+<h3>Friendly and Social Cat Breeds</h3>
+<p>Siamese (highly interactive), Maine Coon (friendly and easygoing), Sphynx (attention-seeking and affectionate).</p>
+
+<h2>Cat Breed Care and Maintenance</h2>
+<p>Understanding care requirements is essential before choosing a breed.</p>
+<ul>
+<li><strong>Long-haired</strong> — daily brushing (Persian, Maine Coon); high grooming</li>
+<li><strong>Short-haired</strong> — minimal grooming (Siamese, British Shorthair); low grooming</li>
+<li><strong>Hairless</strong> — a skin care routine (Sphynx); moderate grooming</li>
+</ul>
+<h3>Nutrition and Health Care</h3>
+<p>All cats require a balanced diet, clean water, and regular veterinary care. Breed-specific considerations may include coat-related nutrition, weight management, and skin sensitivity. High shedding occurs in long-haired breeds, moderate shedding in some medium coats, and low shedding in short-haired breeds.</p>
+
+<p><img src="/cat-breed-identifier.webp" alt="top 10 most popular cat breeds" /></p>
+
+<h2>Popular Cat Breeds Worldwide Trends</h2>
+<p>Cat popularity changes over time based on lifestyle trends and pet ownership patterns.</p>
+<ul>
+<li><strong>Most owned cat breeds</strong> — globally, breeds like Persian, Maine Coon, and British Shorthair remain consistently popular due to their adaptability and recognition.</li>
+<li><strong>Regional popularity</strong> — some breeds are more popular in urban regions (apartment-friendly cats), others preferred in larger homes (active or large breeds).</li>
+<li><strong>Adoption vs pedigree</strong> — many people adopt mixed breed domestic cats, while purebred cats remain popular for their predictable traits.</li>
+</ul>
+
+<h2>FAQs – Popular Cat Breeds</h2>
+<h3>What is "I love you" in cat language?</h3>
+<p>Cats show love through behavior, not words. Common signs include slow blinking, purring, rubbing against you, and sitting close. A slow blink is often considered a cat's way of saying "I trust you."</p>
+<h3>What are 7 big cats?</h3>
+<p>The term big cats usually refers to large wild members of the feline family: lion, tiger, leopard, jaguar, snow leopard, cheetah, and cougar (mountain lion). These are different from domestic cat breeds.</p>
+<h3>What is the friendliest cat breed?</h3>
+<p>The friendliest cat breeds are typically the Ragdoll (very affectionate), Maine Coon (social and gentle), and Siamese (interactive and vocal). They are known for strong human bonding and social behavior.</p>
+<h3>What is the most popular cat breed?</h3>
+<p>The most popular cat breeds worldwide often include the Persian Cat, Maine Coon, and British Shorthair. Popularity comes from a mix of appearance, temperament, and adaptability.</p>
+<h3>What is the #1 cutest cat?</h3>
+<p>"Cutest" is subjective, but commonly loved breeds include the Persian (fluffy and round), Scottish Fold (folded ears), and Ragdoll (soft expression). Their facial features and coat make them widely appealing.</p>
+<h3>Who are the big 5 cats?</h3>
+<p>If focusing only on wild cats, it typically means lion, tiger, leopard, jaguar, and cheetah. The safari "Big Five" is a different term that includes non-cat animals like elephant, rhino, and buffalo.</p>
+<h3>Which cat is the king of cats?</h3>
+<p>The lion is known as the "king of cats" because of its strength, dominance, and position at the top of the wild feline hierarchy.</p>
+<h3>What is the #1 killer of cats?</h3>
+<p>For domestic cats, the leading causes of death are kidney disease, cancer, infections, and accidents (especially in outdoor cats). Regular veterinary care and indoor safety can reduce the risks.</p>
+
+<h2>Conclusion – Choosing the Right Cat Breed</h2>
+<p>Choosing from the top 10 most popular cat breeds in the world is not about picking the most famous name — it is about finding the right fit. The best cat for you depends on your living space, the time you have available, your grooming preference, and the personality you want.</p>
+<p>Each breed offers something unique: <strong>Persian</strong> → beauty and calm; <strong>Maine Coon</strong> → size and friendliness; <strong>Siamese</strong> → intelligence and communication; <strong>Bengal</strong> → energy and activity; <strong>British Shorthair</strong> → simplicity and balance.</p>
+<p>Ready to identify your cat's breed instantly? Try our free <a href="/">Cat Scanner</a> — no signup required.</p>
+`
+
+export default function Page() {
   return (
-    <>
-      <Script id="schema-popular-breeds" type="application/ld+json">
-        {JSON.stringify(schema)}
-      </Script>
-
-      <div style={{ background: 'var(--bg-primary)', minHeight: '100vh' }}>
-
-        {/* ── HERO ── */}
-        <section
-          className="pt-28 pb-16 px-4"
-          style={{
-            background: 'linear-gradient(160deg, var(--bg-primary) 0%, var(--bg-secondary) 100%)',
-          }}
-        >
-          <div className="max-w-4xl mx-auto text-center">
-            <div
-              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold mb-6"
-              style={{ background: 'var(--purple-bg)', color: 'var(--purple)', border: '1px solid var(--border)' }}
-            >
-              <span className="inline-block w-1.5 h-1.5 rounded-full" style={{ background: 'var(--accent)' }} />
-              BREED GUIDE · 10 BREEDS · COMPLETE OVERVIEW
-            </div>
-            <h1
-              className="font-fraunces font-black leading-tight mb-6"
-              style={{ fontSize: 'clamp(2rem, 4.5vw, 3.5rem)', color: 'var(--text-primary)' }}
-            >
-              Top 10{' '}
-              <span className="gradient-text">Most Popular Cat Breeds</span>{' '}
-              in the World
-            </h1>
-            <p className="text-lg leading-relaxed max-w-3xl mx-auto mb-8" style={{ color: 'var(--text-muted)' }}>
-              The most popular cat breeds in the world are usually the ones that combine strong looks, appealing temperament, and practical pet-owner fit. Breeds like the{' '}
-              <strong style={{ color: 'var(--accent)' }}>Persian Cat</strong>,{' '}
-              <strong style={{ color: 'var(--accent)' }}>Maine Coon</strong>,{' '}
-              <strong style={{ color: 'var(--accent)' }}>Siamese Cat</strong>,{' '}
-              <strong style={{ color: 'var(--accent)' }}>Ragdoll</strong>,{' '}
-              <strong style={{ color: 'var(--accent)' }}>Bengal Cat</strong>,{' '}
-              <strong style={{ color: 'var(--accent)' }}>British Shorthair</strong>,{' '}
-              <strong style={{ color: 'var(--accent)' }}>Sphynx Cat</strong>,{' '}
-              <strong style={{ color: 'var(--accent)' }}>Scottish Fold</strong>,{' '}
-              <strong style={{ color: 'var(--accent)' }}>Russian Blue</strong>, and{' '}
-              <strong style={{ color: 'var(--accent)' }}>Abyssinian</strong> are widely recognized because they stand out in appearance, personality, and adaptability as domestic cats.
-            </p>
-            <p className="text-base leading-relaxed max-w-3xl mx-auto" style={{ color: 'var(--text-muted)' }}>
-              If you are comparing the top 10 cat breeds, this guide explains what makes each one popular, how they differ, and which type of feline may suit your home, lifestyle, and care expectations best. Once you know the breed, use our{' '}
-              <Link href="/" style={{ color: 'var(--accent)', fontWeight: 600, textDecoration: 'underline' }}>AI Cat Breed Identifier</Link>{' '}
-              to scan your own cat instantly.
-            </p>
-          </div>
-        </section>
-
-        {/* ── TOP 10 LIST ── */}
-        <section className="py-14 px-4">
-          <div className="max-w-4xl mx-auto">
-            <h2
-              className="font-fraunces font-bold mb-4"
-              style={{ fontSize: 'clamp(1.5rem,3vw,2.2rem)', color: 'var(--text-primary)' }}
-            >
-              Top 10 Most Popular Cat Breeds in the World
-            </h2>
-            <p className="mb-6 leading-relaxed" style={{ color: 'var(--text-muted)' }}>
-              Popularity in cats is not just about beauty. A breed becomes widely loved when it consistently appears in homes, breed registries, adoption searches, online interest, and pet-owner recommendations. In other words, "popular" usually reflects a mix of global visibility, demand, temperament, care fit, and recognizability.
-            </p>
-            <p className="mb-6 font-semibold" style={{ color: 'var(--text-primary)' }}>
-              The top 10 most popular cat breeds typically include:
-            </p>
-            <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-8">
-              {TOP_10.map((breed, i) => (
-                <div
-                  key={breed}
-                  className="rounded-xl px-3 py-4 text-center font-semibold text-sm"
-                  style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}
-                >
-                  <div className="text-xl font-black font-fraunces mb-1" style={{ color: 'var(--accent)' }}>{i + 1}</div>
-                  {breed}
-                </div>
-              ))}
-            </div>
-            <p className="leading-relaxed" style={{ color: 'var(--text-muted)' }}>
-              These breeds are all domestic cats, but they are popular for different reasons. Some are known for luxurious coats, some for affectionate behavior, some for intelligence and playfulness, and others for low-maintenance care or apartment-friendly living.
-            </p>
-          </div>
-        </section>
-
-        {/* ── IMAGE 1 ── */}
-        <section className="px-4 pb-14">
-          <div className="max-w-4xl mx-auto">
-            <div style={{ borderRadius: '1.5rem', border: '1px solid var(--border)', background: 'var(--bg-card)', padding: '0.75rem', boxShadow: '0 0 40px rgba(249,115,22,0.15)' }}>
-              <img
-                src="/most-popular-cat-breeds-in-the-world.webp"
-                alt="most popular cat breeds in the world"
-                style={{ width: '100%', height: 'auto', borderRadius: '1rem', display: 'block' }}
-              />
-            </div>
-          </div>
-        </section>
-
-        {/* ── WHAT DEFINES A POPULAR BREED ── */}
-        <section className="py-14 px-4" style={{ background: 'var(--bg-secondary)' }}>
-          <div className="max-w-4xl mx-auto">
-            <h2
-              className="font-fraunces font-bold mb-6"
-              style={{ fontSize: 'clamp(1.4rem,3vw,2rem)', color: 'var(--text-primary)' }}
-            >
-              What Defines a Popular Cat Breed
-            </h2>
-            <p className="mb-6 leading-relaxed" style={{ color: 'var(--text-muted)' }}>
-              A popular cat breed usually checks several boxes at once:
-            </p>
-            <ul className="mb-8 space-y-2">
-              {['Easy to recognize visually','Strong reputation among cat owners','Suitable for home life','Appealing personality or temperament','Broad media and social visibility','Regular presence in pedigree and breed association discussions'].map(item => (
-                <li key={item} className="flex items-start gap-3">
-                  <span style={{ color: 'var(--accent)', marginTop: '2px' }}>🐾</span>
-                  <span style={{ color: 'var(--text-muted)' }}>{item}</span>
-                </li>
-              ))}
-            </ul>
-            <p className="mb-4 font-semibold" style={{ color: 'var(--text-primary)' }}>Popularity can come from different sources. For example:</p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
-              {[
-                { breed: 'Persian Cat', reason: 'popular because of its iconic long coat and calm, elegant look.' },
-                { breed: 'Maine Coon', reason: 'popular because of its large size, friendly personality, and family-friendly reputation.' },
-                { breed: 'Bengal Cat', reason: 'stands out for its wild-looking coat pattern and high energy.' },
-                { breed: 'British Shorthair', reason: 'remains popular because it is calm, sturdy, and relatively low maintenance.' },
-              ].map(({ breed, reason }) => (
-                <div key={breed} className="rounded-xl p-4" style={{ background: 'var(--bg-card)', border: '1px solid var(--border)' }}>
-                  <p className="font-semibold mb-1" style={{ color: 'var(--accent)' }}>{breed}</p>
-                  <p className="text-sm" style={{ color: 'var(--text-muted)' }}>is {reason}</p>
-                </div>
-              ))}
-            </div>
-            <p className="leading-relaxed" style={{ color: 'var(--text-muted)' }}>
-              That means popularity is a relationship between appearance, behavior, and everyday livability.
-            </p>
-
-            {/* Global Trends Table */}
-            <h3 className="font-fraunces font-bold mt-10 mb-5" style={{ fontSize: 'clamp(1.2rem,2.5vw,1.6rem)', color: 'var(--text-primary)' }}>
-              Global Cat Popularity Trends
-            </h3>
-            <p className="mb-6 leading-relaxed" style={{ color: 'var(--text-muted)' }}>
-              Worldwide cat popularity is shaped by several trends:
-            </p>
-            <div className="overflow-x-auto rounded-xl mb-6" style={{ border: '1px solid var(--border)' }}>
-              <table className="w-full text-sm">
-                <thead>
-                  <tr style={{ background: 'var(--accent)', color: '#fff' }}>
-                    <th className="text-left px-4 py-3 font-semibold">Trend</th>
-                    <th className="text-left px-4 py-3 font-semibold">Why It Matters</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {[
-                    ['Apartment living', 'Increases demand for adaptable indoor cats'],
-                    ['Family pet preferences', 'Favors friendly and social breeds'],
-                    ['Grooming expectations', 'Influences whether long-haired or short-haired breeds are preferred'],
-                    ['Online visibility', 'Popular breeds get more exposure through photos, videos, and social media'],
-                    ['Breed recognition', 'Cat associations such as CFA and TICA help formalize breed awareness'],
-                  ].map(([trend, why], i) => (
-                    <tr key={trend} style={{ background: i % 2 === 0 ? 'var(--bg-card)' : 'var(--bg-card-hover)' }}>
-                      <td className="px-4 py-3 font-medium" style={{ color: 'var(--text-primary)' }}>{trend}</td>
-                      <td className="px-4 py-3" style={{ color: 'var(--text-muted)' }}>{why}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            <p className="leading-relaxed" style={{ color: 'var(--text-muted)' }}>
-              Some breeds perform well globally because they match modern lifestyles. Indoor cats, friendly cat breeds, and low maintenance cats tend to appeal to a wider audience than breeds that need constant attention or highly specialized environments.
-            </p>
-          </div>
-        </section>
-
-        {/* ── WHAT MAKES A CAT BREED POPULAR ── */}
-        <section className="py-14 px-4">
-          <div className="max-w-4xl mx-auto">
-            <h2 className="font-fraunces font-bold mb-6" style={{ fontSize: 'clamp(1.4rem,3vw,2rem)', color: 'var(--text-primary)' }}>
-              What Makes a Cat Breed Popular
-            </h2>
-            <p className="mb-8 leading-relaxed" style={{ color: 'var(--text-muted)' }}>
-              Not every beautiful cat becomes one of the most popular cat breeds in the world. Popularity usually comes from a combination of temperament, appearance, care needs, and home compatibility.
-            </p>
-
-            <div className="space-y-8">
-              {/* Temperament */}
-              <div className="rounded-2xl p-6" style={{ background: 'var(--bg-card)', border: '1px solid var(--border)' }}>
-                <h3 className="font-fraunces font-bold mb-3 text-xl" style={{ color: 'var(--accent)' }}>Temperament and Personality</h3>
-                <p className="mb-4 leading-relaxed" style={{ color: 'var(--text-muted)' }}>
-                  For most pet owners, personality matters just as much as looks. A cat that is affectionate, social, calm, or playful is more likely to earn long-term popularity.
-                </p>
-                <p className="mb-3 font-medium" style={{ color: 'var(--text-primary)' }}>Key temperament traits that influence popularity:</p>
-                <div className="flex flex-wrap gap-2 mb-4">
-                  {['Affection level','Social behavior','Energy level','Intelligence','Playfulness','Calmness'].map(t => (
-                    <span key={t} className="px-3 py-1 rounded-full text-sm" style={{ background: 'var(--purple-bg)', color: 'var(--purple)', border: '1px solid var(--border)' }}>{t}</span>
-                  ))}
-                </div>
-                <ul className="space-y-2">
-                  {[
-                    ['Ragdoll cats', 'loved for their gentle, affectionate nature.'],
-                    ['Siamese cats', 'famous for being vocal, social, and interactive.'],
-                    ['Russian Blue cats', 'often appreciated for being intelligent and loyal.'],
-                    ['Abyssinians', 'attract owners who want an active, curious feline companion.'],
-                  ].map(([breed, desc]) => (
-                    <li key={breed} className="flex gap-2 text-sm">
-                      <span style={{ color: 'var(--accent)' }}>→</span>
-                      <span style={{ color: 'var(--text-muted)' }}><strong style={{ color: 'var(--text-primary)' }}>{breed}</strong> are {desc}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              {/* Appearance */}
-              <div className="rounded-2xl p-6" style={{ background: 'var(--bg-card)', border: '1px solid var(--border)' }}>
-                <h3 className="font-fraunces font-bold mb-3 text-xl" style={{ color: 'var(--purple)' }}>Appearance and Coat Type</h3>
-                <p className="mb-4 leading-relaxed" style={{ color: 'var(--text-muted)' }}>
-                  Visual appeal plays a major role in breed popularity. Some breeds stand out because of their coat, eye color, face shape, or body structure.
-                </p>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {[
-                    { breed: 'Persian Cat', trait: 'luxurious long coat and distinctive face' },
-                    { breed: 'Bengal Cat', trait: 'spotted or marbled coat pattern' },
-                    { breed: 'Sphynx Cat', trait: 'hairless appearance' },
-                    { breed: 'Siamese Cat', trait: 'pointed coat and striking blue eyes' },
-                    { breed: 'British Shorthair', trait: 'dense plush coat and round build' },
-                  ].map(({ breed, trait }) => (
-                    <div key={breed} className="flex items-start gap-2 text-sm p-3 rounded-lg" style={{ background: 'var(--bg-secondary)' }}>
-                      <span style={{ color: 'var(--accent)' }}>🐱</span>
-                      <span style={{ color: 'var(--text-muted)' }}><strong style={{ color: 'var(--text-primary)' }}>{breed}:</strong> {trait}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Adaptability */}
-              <div className="rounded-2xl p-6" style={{ background: 'var(--bg-card)', border: '1px solid var(--border)' }}>
-                <h3 className="font-fraunces font-bold mb-3 text-xl" style={{ color: 'var(--accent)' }}>Adaptability for Indoor Living</h3>
-                <p className="mb-4 leading-relaxed" style={{ color: 'var(--text-muted)' }}>
-                  Today, many of the most popular cat breeds are also the best indoor cats. A breed tends to gain popularity when it can adapt to indoor routines, family settings, limited space, regular human interaction, and predictable home environments.
-                </p>
-                <p className="text-sm font-medium mb-2" style={{ color: 'var(--text-primary)' }}>This is why users frequently search for:</p>
-                <div className="flex flex-wrap gap-2">
-                  {['Best cat breeds for apartments','Best cat for families','Best cat breeds for beginners'].map(q => (
-                    <span key={q} className="px-3 py-1.5 rounded-full text-xs font-medium" style={{ background: 'var(--accent-bg)', color: 'var(--accent)', border: '1px solid rgba(249,115,22,0.2)' }}>{q}</span>
-                  ))}
-                </div>
-              </div>
-
-              {/* Maintenance */}
-              <div className="rounded-2xl p-6" style={{ background: 'var(--bg-card)', border: '1px solid var(--border)' }}>
-                <h3 className="font-fraunces font-bold mb-3 text-xl" style={{ color: 'var(--purple)' }}>Maintenance and Grooming Needs</h3>
-                <p className="mb-4 leading-relaxed" style={{ color: 'var(--text-muted)' }}>
-                  Popularity is also shaped by how much work the breed requires. Care-related factors include grooming, shedding level, skin care, nutrition, health monitoring, and veterinary care needs.
-                </p>
-                <ul className="space-y-2 text-sm">
-                  {[
-                    'Persian Cats are beautiful, but their long coat means more grooming.',
-                    'British Shorthairs and Russian Blues tend to be easier to maintain.',
-                    'Sphynx Cats do not shed in the same way, but they need regular skin care.',
-                    'Maine Coons have a thick coat, so maintenance matters even though they are widely loved.',
-                  ].map(item => (
-                    <li key={item} className="flex gap-2">
-                      <span style={{ color: 'var(--accent)' }}>•</span>
-                      <span style={{ color: 'var(--text-muted)' }}>{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* ── OVERVIEW TABLE ── */}
-        <section className="py-14 px-4" style={{ background: 'var(--bg-secondary)' }}>
-          <div className="max-w-5xl mx-auto">
-            <h2 className="font-fraunces font-bold mb-4" style={{ fontSize: 'clamp(1.4rem,3vw,2rem)', color: 'var(--text-primary)' }}>
-              Top 10 Cat Breeds List (Quick Overview)
-            </h2>
-            <p className="mb-8 leading-relaxed" style={{ color: 'var(--text-muted)' }}>
-              Before going breed by breed, it helps to look at the full list in one place. This overview makes the relationships between appearance, personality, size, grooming, and home suitability easier to understand.
-            </p>
-            <div className="overflow-x-auto rounded-xl" style={{ border: '1px solid var(--border)' }}>
-              <table className="w-full text-sm">
-                <thead>
-                  <tr style={{ background: 'var(--accent)', color: '#fff' }}>
-                    <th className="text-left px-4 py-3 font-semibold">Breed</th>
-                    <th className="text-left px-4 py-3 font-semibold">Coat Type</th>
-                    <th className="text-left px-4 py-3 font-semibold">Energy Level</th>
-                    <th className="text-left px-4 py-3 font-semibold">Grooming</th>
-                    <th className="text-left px-4 py-3 font-semibold">Common Appeal</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {OVERVIEW_TABLE.map((row, i) => (
-                    <tr key={row.breed} style={{ background: i % 2 === 0 ? 'var(--bg-card)' : 'var(--bg-card-hover)' }}>
-                      <td className="px-4 py-3 font-semibold" style={{ color: 'var(--text-primary)' }}>{row.breed}</td>
-                      <td className="px-4 py-3" style={{ color: 'var(--text-muted)' }}>{row.coat}</td>
-                      <td className="px-4 py-3" style={{ color: 'var(--text-muted)' }}>{row.energy}</td>
-                      <td className="px-4 py-3" style={{ color: 'var(--text-muted)' }}>{row.grooming}</td>
-                      <td className="px-4 py-3" style={{ color: 'var(--text-muted)' }}>{row.appeal}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </section>
-
-        {/* ── BREED DETAILS ── */}
-        <section className="py-14 px-4">
-          <div className="max-w-4xl mx-auto space-y-14">
-
-            {/* Persian */}
-            <div>
-              <div className="flex items-center gap-3 mb-5">
-                <span className="text-3xl">🐱</span>
-                <h2 className="font-fraunces font-bold" style={{ fontSize: 'clamp(1.4rem,3vw,2rem)', color: 'var(--text-primary)' }}>1. Persian Cat</h2>
-              </div>
-              <p className="mb-4 leading-relaxed" style={{ color: 'var(--text-muted)' }}>
-                The Persian Cat is one of the most famous and instantly recognizable cat breeds in the world. Its popularity comes from a mix of beauty, calm temperament, and strong breed identity. When people imagine a luxurious house cat or classic pedigree cat, the Persian is often one of the first images that comes to mind.
-              </p>
-              <h3 className="font-semibold mb-2" style={{ color: 'var(--accent)' }}>Origin and History</h3>
-              <p className="mb-4 leading-relaxed text-sm" style={{ color: 'var(--text-muted)' }}>
-                Persians have long been associated with elegance and formal breed recognition. Their enduring popularity is tied to strong historical recognition, a distinct appearance, broad visibility in media and pet culture, and consistent demand among owners who want a calm indoor cat.
-              </p>
-              <h3 className="font-semibold mb-2" style={{ color: 'var(--accent)' }}>Physical Appearance and Coat</h3>
-              <div className="flex flex-wrap gap-2 mb-4">
-                {['Long-haired coat','Rounded body','Full cheeks','Flat or shorter muzzle','Large expressive eyes','Dense, full fur texture'].map(t => (
-                  <span key={t} className="px-3 py-1 rounded-full text-xs" style={{ background: 'var(--bg-secondary)', color: 'var(--text-muted)', border: '1px solid var(--border)' }}>{t}</span>
-                ))}
-              </div>
-              <h3 className="font-semibold mb-2" style={{ color: 'var(--accent)' }}>Personality and Temperament</h3>
-              <p className="mb-3 text-sm leading-relaxed" style={{ color: 'var(--text-muted)' }}>
-                Calm, gentle, and quiet — the Persian is comfortable in stable indoor settings. It is not the best fit for someone wanting a highly athletic cat, but its charm comes from presence, softness, and calm companionship.
-              </p>
-              <h3 className="font-semibold mb-2" style={{ color: 'var(--accent)' }}>Grooming and Care Needs</h3>
-              <p className="text-sm leading-relaxed" style={{ color: 'var(--text-muted)' }}>
-                The Persian requires regular brushing to prevent matting, ongoing coat maintenance, and hygiene attention around the face. It is best for owners who understand the grooming commitment.
-              </p>
-            </div>
-
-            {/* Maine Coon */}
-            <div style={{ borderTop: '1px solid var(--border)', paddingTop: '3.5rem' }}>
-              <div className="flex items-center gap-3 mb-5">
-                <span className="text-3xl">🦁</span>
-                <h2 className="font-fraunces font-bold" style={{ fontSize: 'clamp(1.4rem,3vw,2rem)', color: 'var(--text-primary)' }}>2. Maine Coon</h2>
-              </div>
-              <p className="mb-4 leading-relaxed" style={{ color: 'var(--text-muted)' }}>
-                The Maine Coon is one of the most admired and widely loved cat breeds in the world. It combines size, personality, and a rugged but friendly appearance in a way that appeals to both experienced cat owners and first-time families.
-              </p>
-              <h3 className="font-semibold mb-2" style={{ color: 'var(--accent)' }}>Size, Body Structure, and Coat</h3>
-              <div className="flex flex-wrap gap-2 mb-4">
-                {['Large cat breed','Strong bone structure','Broad chest','Long body','Thick coat','Often tufted ears','Full tail'].map(t => (
-                  <span key={t} className="px-3 py-1 rounded-full text-xs" style={{ background: 'var(--bg-secondary)', color: 'var(--text-muted)', border: '1px solid var(--border)' }}>{t}</span>
-                ))}
-              </div>
-              <h3 className="font-semibold mb-2" style={{ color: 'var(--accent)' }}>Personality — The Gentle Giant</h3>
-              <p className="mb-4 text-sm leading-relaxed" style={{ color: 'var(--text-muted)' }}>
-                Friendly, social, intelligent, and playful without being overwhelming. The Maine Coon is a great fit for families and balances affection and independence well.
-              </p>
-              <div className="overflow-x-auto rounded-xl" style={{ border: '1px solid var(--border)' }}>
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr style={{ background: 'var(--purple)', color: '#fff' }}>
-                      <th className="text-left px-4 py-2">Breed</th>
-                      <th className="text-left px-4 py-2">Coat</th>
-                      <th className="text-left px-4 py-2">Grooming</th>
-                      <th className="text-left px-4 py-2">Temperament</th>
-                      <th className="text-left px-4 py-2">Best Fit</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr style={{ background: 'var(--bg-card)' }}>
-                      <td className="px-4 py-2 font-semibold" style={{ color: 'var(--text-primary)' }}>Persian</td>
-                      <td className="px-4 py-2" style={{ color: 'var(--text-muted)' }}>Long-haired</td>
-                      <td className="px-4 py-2" style={{ color: 'var(--text-muted)' }}>High</td>
-                      <td className="px-4 py-2" style={{ color: 'var(--text-muted)' }}>Calm, quiet</td>
-                      <td className="px-4 py-2" style={{ color: 'var(--text-muted)' }}>Heavy grooming owners</td>
-                    </tr>
-                    <tr style={{ background: 'var(--bg-card-hover)' }}>
-                      <td className="px-4 py-2 font-semibold" style={{ color: 'var(--text-primary)' }}>Maine Coon</td>
-                      <td className="px-4 py-2" style={{ color: 'var(--text-muted)' }}>Long-haired</td>
-                      <td className="px-4 py-2" style={{ color: 'var(--text-muted)' }}>Moderate–High</td>
-                      <td className="px-4 py-2" style={{ color: 'var(--text-muted)' }}>Friendly, social</td>
-                      <td className="px-4 py-2" style={{ color: 'var(--text-muted)' }}>Families, large-cat lovers</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-
-            {/* Siamese */}
-            <div style={{ borderTop: '1px solid var(--border)', paddingTop: '3.5rem' }}>
-              <div className="flex items-center gap-3 mb-5">
-                <span className="text-3xl">👁️</span>
-                <h2 className="font-fraunces font-bold" style={{ fontSize: 'clamp(1.4rem,3vw,2rem)', color: 'var(--text-primary)' }}>3. Siamese Cat</h2>
-              </div>
-              <p className="mb-4 leading-relaxed" style={{ color: 'var(--text-muted)' }}>
-                The Siamese Cat is one of the most recognizable and historically popular cat breeds in the world. Its unique combination of appearance, vocal personality, and strong social behavior makes it a standout among domestic cats.
-              </p>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {[
-                  { title: 'Coat Pattern & Eyes', points: ['Short-haired coat','Slender athletic build','Color-point pattern','Bright blue eyes','Light body with darker extremities'] },
-                  { title: 'Personality', points: ['Very vocal','Social and people-oriented','Intelligent','Seeks attention and interaction','Great for active households'] },
-                ].map(({ title, points }) => (
-                  <div key={title} className="rounded-xl p-4" style={{ background: 'var(--bg-card)', border: '1px solid var(--border)' }}>
-                    <p className="font-semibold mb-3" style={{ color: 'var(--accent)' }}>{title}</p>
-                    <ul className="space-y-1">
-                      {points.map(p => <li key={p} className="text-sm flex gap-2"><span style={{ color: 'var(--accent)' }}>•</span><span style={{ color: 'var(--text-muted)' }}>{p}</span></li>)}
-                    </ul>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Ragdoll */}
-            <div style={{ borderTop: '1px solid var(--border)', paddingTop: '3.5rem' }}>
-              <div className="flex items-center gap-3 mb-5">
-                <span className="text-3xl">💜</span>
-                <h2 className="font-fraunces font-bold" style={{ fontSize: 'clamp(1.4rem,3vw,2rem)', color: 'var(--text-primary)' }}>4. Ragdoll</h2>
-              </div>
-              <p className="mb-4 leading-relaxed" style={{ color: 'var(--text-muted)' }}>
-                The Ragdoll is one of the most loved cat breeds due to its gentle personality and strong indoor adaptability. It is often ranked among the best cat breeds for families. Known for its medium to large body, soft semi-long coat, blue eyes, and relaxed posture — the Ragdoll's popularity comes largely from its temperament: extremely affectionate, calm, enjoys being held, and friendly with people and other pets.
-              </p>
-              <p className="text-sm leading-relaxed" style={{ color: 'var(--text-muted)' }}>
-                Ragdolls are highly suited for indoor living with low aggression and adaptation to apartments. Despite having longer fur, they require only moderate grooming and are less prone to matting than some long-haired breeds.
-              </p>
-            </div>
-
-            {/* Bengal */}
-            <div style={{ borderTop: '1px solid var(--border)', paddingTop: '3.5rem' }}>
-              <div className="flex items-center gap-3 mb-5">
-                <span className="text-3xl">🐆</span>
-                <h2 className="font-fraunces font-bold" style={{ fontSize: 'clamp(1.4rem,3vw,2rem)', color: 'var(--text-primary)' }}>5. Bengal Cat</h2>
-              </div>
-              <p className="mb-4 leading-relaxed" style={{ color: 'var(--text-muted)' }}>
-                The Bengal Cat stands out among the most popular cat breeds because of its wild appearance and high energy level. It is one of the most visually striking domestic cats with its spotted or marbled leopard-like coat pattern and muscular, athletic body.
-              </p>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                {[
-                  { icon: '⚡', title: 'Energy', desc: 'High energy, loves climbing, needs stimulation' },
-                  { icon: '🧠', title: 'Intelligence', desc: 'Highly curious and play-driven, needs interactive toys' },
-                  { icon: '✂️', title: 'Grooming', desc: 'Short coat, low shedding maintenance — but needs active environment' },
-                ].map(({ icon, title, desc }) => (
-                  <div key={title} className="rounded-xl p-4 text-center" style={{ background: 'var(--bg-card)', border: '1px solid var(--border)' }}>
-                    <div className="text-2xl mb-2">{icon}</div>
-                    <p className="font-semibold mb-1 text-sm" style={{ color: 'var(--text-primary)' }}>{title}</p>
-                    <p className="text-xs" style={{ color: 'var(--text-muted)' }}>{desc}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* British Shorthair */}
-            <div style={{ borderTop: '1px solid var(--border)', paddingTop: '3.5rem' }}>
-              <div className="flex items-center gap-3 mb-5">
-                <span className="text-3xl">🇬🇧</span>
-                <h2 className="font-fraunces font-bold" style={{ fontSize: 'clamp(1.4rem,3vw,2rem)', color: 'var(--text-primary)' }}>6. British Shorthair</h2>
-              </div>
-              <p className="mb-4 leading-relaxed" style={{ color: 'var(--text-muted)' }}>
-                The British Shorthair is one of the most balanced and widely loved cat breeds. Its calm personality, sturdy body, and low maintenance needs make it highly popular worldwide. Known for its dense plush short coat, round face, and compact sturdy body — it is a top choice for quiet homes and apartment living.
-              </p>
-              <p className="text-sm leading-relaxed" style={{ color: 'var(--text-muted)' }}>
-                British Shorthairs are calm, independent, and have low vocal behavior. They require minimal grooming with moderate shedding and adapt well to indoor living, smaller spaces, and consistent routines.
-              </p>
-            </div>
-
-            {/* Sphynx */}
-            <div style={{ borderTop: '1px solid var(--border)', paddingTop: '3.5rem' }}>
-              <div className="flex items-center gap-3 mb-5">
-                <span className="text-3xl">✨</span>
-                <h2 className="font-fraunces font-bold" style={{ fontSize: 'clamp(1.4rem,3vw,2rem)', color: 'var(--text-primary)' }}>7. Sphynx Cat</h2>
-              </div>
-              <p className="mb-4 leading-relaxed" style={{ color: 'var(--text-muted)' }}>
-                The Sphynx Cat is one of the most unique and recognizable cat breeds due to its hairless appearance. Its popularity comes from both its distinctive look and its highly affectionate, social personality. Unlike other cats, the Sphynx requires regular skin cleaning, protection from temperature changes, and management of oil buildup — making it a different type of maintenance, not low maintenance.
-              </p>
-              <p className="text-sm leading-relaxed" style={{ color: 'var(--text-muted)' }}>
-                Sphynx cats are highly social, attention-seeking, and energetic. They are often searched under "most unique cat breeds" and "hairless cat breeds."
-              </p>
-            </div>
-          </div>
-        </section>
-
-        {/* ── IMAGE 2 ── */}
-        <section className="px-4 py-10" style={{ background: 'var(--bg-secondary)' }}>
-          <div className="max-w-4xl mx-auto">
-            <div style={{ borderRadius: '1.5rem', border: '1px solid var(--border)', background: 'var(--bg-card)', padding: '0.75rem', boxShadow: '0 0 40px rgba(167,139,250,0.2)' }}>
-              <img
-                src="/cat-identifier.webp"
-                alt="most popular cat breeds in the world"
-                style={{ width: '100%', height: 'auto', borderRadius: '1rem', display: 'block' }}
-              />
-            </div>
-          </div>
-        </section>
-
-        {/* ── COMPARISON TABLES ── */}
-        <section className="py-14 px-4" style={{ background: 'var(--bg-secondary)' }}>
-          <div className="max-w-5xl mx-auto">
-            <h2 className="font-fraunces font-bold mb-4" style={{ fontSize: 'clamp(1.4rem,3vw,2rem)', color: 'var(--text-primary)' }}>
-              Cat Breed Comparison Table
-            </h2>
-            <p className="mb-8 leading-relaxed" style={{ color: 'var(--text-muted)' }}>
-              A comparison table helps users quickly evaluate differences between the top 10 most popular cat breeds based on key attributes like size, lifespan, temperament, and maintenance.
-            </p>
-
-            <h3 className="font-fraunces font-semibold mb-4 text-lg" style={{ color: 'var(--text-primary)' }}>Size, Lifespan, and Temperament</h3>
-            <div className="overflow-x-auto rounded-xl mb-10" style={{ border: '1px solid var(--border)' }}>
-              <table className="w-full text-sm">
-                <thead>
-                  <tr style={{ background: 'var(--purple)', color: '#fff' }}>
-                    <th className="text-left px-4 py-3">Breed</th>
-                    <th className="text-left px-4 py-3">Size</th>
-                    <th className="text-left px-4 py-3">Lifespan</th>
-                    <th className="text-left px-4 py-3">Temperament</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {SIZE_TABLE.map((row, i) => (
-                    <tr key={row.breed} style={{ background: i % 2 === 0 ? 'var(--bg-card)' : 'var(--bg-card-hover)' }}>
-                      <td className="px-4 py-3 font-semibold" style={{ color: 'var(--text-primary)' }}>{row.breed}</td>
-                      <td className="px-4 py-3" style={{ color: 'var(--text-muted)' }}>{row.size}</td>
-                      <td className="px-4 py-3" style={{ color: 'var(--text-muted)' }}>{row.lifespan}</td>
-                      <td className="px-4 py-3" style={{ color: 'var(--text-muted)' }}>{row.temperament}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-
-            <h3 className="font-fraunces font-semibold mb-4 text-lg" style={{ color: 'var(--text-primary)' }}>Grooming and Maintenance Level</h3>
-            <div className="overflow-x-auto rounded-xl mb-10" style={{ border: '1px solid var(--border)' }}>
-              <table className="w-full text-sm">
-                <thead>
-                  <tr style={{ background: 'var(--accent)', color: '#fff' }}>
-                    <th className="text-left px-4 py-3">Breed</th>
-                    <th className="text-left px-4 py-3">Coat Type</th>
-                    <th className="text-left px-4 py-3">Grooming Level</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {GROOMING_TABLE.map((row, i) => (
-                    <tr key={row.breed} style={{ background: i % 2 === 0 ? 'var(--bg-card)' : 'var(--bg-card-hover)' }}>
-                      <td className="px-4 py-3 font-semibold" style={{ color: 'var(--text-primary)' }}>{row.breed}</td>
-                      <td className="px-4 py-3" style={{ color: 'var(--text-muted)' }}>{row.coat}</td>
-                      <td className="px-4 py-3">
-                        <span
-                          className="px-2 py-0.5 rounded-full text-xs font-semibold"
-                          style={{
-                            background: row.grooming === 'High' ? 'rgba(239,68,68,0.1)' : row.grooming === 'Low' ? 'rgba(34,197,94,0.1)' : 'rgba(249,115,22,0.1)',
-                            color: row.grooming === 'High' ? '#ef4444' : row.grooming === 'Low' ? '#16a34a' : 'var(--accent)',
-                          }}
-                        >
-                          {row.grooming}
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-
-            {/* Best for ... */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              {[
-                { title: 'Best for Families', icon: '👨‍👩‍👧', items: ['Maine Coon', 'Ragdoll', 'British Shorthair'] },
-                { title: 'Best for Apartments', icon: '🏢', items: ['British Shorthair', 'Persian', 'Russian Blue'] },
-                { title: 'Best for Active Homes', icon: '⚡', items: ['Bengal', 'Abyssinian', 'Siamese'] },
-              ].map(({ title, icon, items }) => (
-                <div key={title} className="rounded-xl p-5" style={{ background: 'var(--bg-card)', border: '1px solid var(--border)' }}>
-                  <div className="text-2xl mb-2">{icon}</div>
-                  <p className="font-semibold mb-3 text-sm" style={{ color: 'var(--text-primary)' }}>{title}</p>
-                  {items.map(b => <p key={b} className="text-sm py-1 border-b" style={{ color: 'var(--text-muted)', borderColor: 'var(--border)' }}>→ {b}</p>)}
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* ── BREED CATEGORIES ── */}
-        <section className="py-14 px-4">
-          <div className="max-w-4xl mx-auto">
-            <h2 className="font-fraunces font-bold mb-6" style={{ fontSize: 'clamp(1.4rem,3vw,2rem)', color: 'var(--text-primary)' }}>
-              Cat Breed Categories
-            </h2>
-            <p className="mb-8 leading-relaxed" style={{ color: 'var(--text-muted)' }}>
-              Understanding categories helps simplify decision-making, especially for users comparing multiple breeds.
-            </p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              {[
-                { title: 'Long-Haired Cat Breeds', icon: '🌟', breeds: ['Persian','Maine Coon','Ragdoll','Birman'], note: 'Best for: owners who enjoy grooming and want a soft, luxurious coat' },
-                { title: 'Short-Haired Cat Breeds', icon: '✂️', breeds: ['Siamese','Bengal','British Shorthair','Russian Blue','Abyssinian'], note: 'Best for: low-maintenance grooming and easy care' },
-                { title: 'Hairless Cat Breeds', icon: '✨', breeds: ['Sphynx'], note: 'Best for: unique appearance (but requires skin care)' },
-                { title: 'Large vs Small Breeds', icon: '📏', breeds: ['Large: Maine Coon, Ragdoll','Medium: Most popular breeds','Smaller: Siamese, Abyssinian'], note: 'Physical traits connect directly with care and lifestyle choices' },
-              ].map(({ title, icon, breeds, note }) => (
-                <div key={title} className="rounded-2xl p-6" style={{ background: 'var(--bg-card)', border: '1px solid var(--border)' }}>
-                  <div className="flex items-center gap-2 mb-4">
-                    <span className="text-xl">{icon}</span>
-                    <h3 className="font-fraunces font-semibold" style={{ color: 'var(--accent)' }}>{title}</h3>
-                  </div>
-                  <ul className="space-y-1 mb-3">
-                    {breeds.map(b => <li key={b} className="text-sm flex gap-2"><span style={{ color: 'var(--accent)' }}>→</span><span style={{ color: 'var(--text-primary)' }}>{b}</span></li>)}
-                  </ul>
-                  <p className="text-xs italic" style={{ color: 'var(--text-faint)' }}>{note}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* ── LIFESTYLE MATCH ── */}
-        <section className="py-14 px-4" style={{ background: 'var(--bg-secondary)' }}>
-          <div className="max-w-4xl mx-auto">
-            <h2 className="font-fraunces font-bold mb-6" style={{ fontSize: 'clamp(1.4rem,3vw,2rem)', color: 'var(--text-primary)' }}>
-              Best Cat Breeds Based on Lifestyle
-            </h2>
-            <p className="mb-8 leading-relaxed" style={{ color: 'var(--text-muted)' }}>
-              Choosing the right cat is not just about popularity — it is about matching the breed with your daily life.
-            </p>
-            <div className="space-y-6">
-              {[
-                { title: 'Best Cat Breeds for Families', items: [['Maine Coon','friendly and social'],['Ragdoll','gentle and affectionate'],['British Shorthair','calm and stable']] },
-                { title: 'Best Cat Breeds for Apartments', items: [['British Shorthair','low energy, quiet'],['Persian','calm indoor companion'],['Russian Blue','adaptable and reserved']] },
-                { title: 'Low Maintenance Cat Breeds', items: [['Siamese','easy care'],['Bengal','simple routines'],['Abyssinian','minimal grooming'],['British Shorthair','easy daily care']] },
-                { title: 'Friendly and Social Cat Breeds', items: [['Siamese','highly interactive'],['Maine Coon','friendly and easygoing'],['Sphynx','attention-seeking and affectionate']] },
-              ].map(({ title, items }) => (
-                <div key={title} className="rounded-2xl p-6" style={{ background: 'var(--bg-card)', border: '1px solid var(--border)' }}>
-                  <h3 className="font-fraunces font-semibold mb-4" style={{ color: 'var(--text-primary)' }}>{title}</h3>
-                  <div className="flex flex-wrap gap-3">
-                    {items.map(([breed, desc]) => (
-                      <div key={breed} className="px-3 py-2 rounded-xl text-sm" style={{ background: 'var(--accent-bg)', border: '1px solid rgba(249,115,22,0.2)' }}>
-                        <span className="font-semibold" style={{ color: 'var(--accent)' }}>{breed}</span>
-                        <span className="ml-1" style={{ color: 'var(--text-muted)' }}>→ {desc}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* ── CARE & MAINTENANCE ── */}
-        <section className="py-14 px-4">
-          <div className="max-w-4xl mx-auto">
-            <h2 className="font-fraunces font-bold mb-6" style={{ fontSize: 'clamp(1.4rem,3vw,2rem)', color: 'var(--text-primary)' }}>
-              Cat Breed Care and Maintenance
-            </h2>
-            <p className="mb-8 leading-relaxed" style={{ color: 'var(--text-muted)' }}>
-              Understanding care requirements is essential before choosing a breed.
-            </p>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
-              {[
-                { title: 'Long-haired', icon: '🌀', care: 'Daily brushing', examples: 'Persian, Maine Coon', level: 'High' },
-                { title: 'Short-haired', icon: '✂️', care: 'Minimal grooming', examples: 'Siamese, British Shorthair', level: 'Low' },
-                { title: 'Hairless', icon: '✨', care: 'Skin care routine', examples: 'Sphynx', level: 'Moderate' },
-              ].map(({ title, icon, care, examples, level }) => (
-                <div key={title} className="rounded-2xl p-5 text-center" style={{ background: 'var(--bg-card)', border: '1px solid var(--border)' }}>
-                  <div className="text-3xl mb-3">{icon}</div>
-                  <h3 className="font-semibold mb-1" style={{ color: 'var(--text-primary)' }}>{title}</h3>
-                  <p className="text-sm mb-2" style={{ color: 'var(--text-muted)' }}>{care}</p>
-                  <p className="text-xs mb-2" style={{ color: 'var(--text-faint)' }}>{examples}</p>
-                  <span className="text-xs font-semibold px-2 py-0.5 rounded-full" style={{ background: 'var(--accent-bg)', color: 'var(--accent)' }}>
-                    {level} grooming
-                  </span>
-                </div>
-              ))}
-            </div>
-            <div className="rounded-2xl p-6" style={{ background: 'var(--bg-card)', border: '1px solid var(--border)' }}>
-              <h3 className="font-fraunces font-semibold mb-4" style={{ color: 'var(--text-primary)' }}>Nutrition and Health Care</h3>
-              <p className="text-sm leading-relaxed mb-4" style={{ color: 'var(--text-muted)' }}>
-                All cats require a balanced diet, clean water, and regular veterinary care. Breed-specific considerations may include coat-related nutrition, weight management, and skin sensitivity.
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {['High shedding → long-haired breeds','Moderate → some medium coats','Low shedding → short-haired breeds'].map(item => (
-                  <span key={item} className="text-xs px-3 py-1.5 rounded-full" style={{ background: 'var(--bg-secondary)', color: 'var(--text-muted)', border: '1px solid var(--border)' }}>{item}</span>
-                ))}
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* ── IMAGE 3 ── */}
-        <section className="px-4 py-10" style={{ background: 'var(--bg-secondary)' }}>
-          <div className="max-w-4xl mx-auto">
-            <div style={{ borderRadius: '1.5rem', border: '1px solid var(--border)', background: 'var(--bg-card)', padding: '0.75rem', boxShadow: '0 0 40px rgba(249,115,22,0.18)' }}>
-              <img
-                src="/cat-breed-identifier.webp"
-                alt="top 10 most popular cat breeds"
-                style={{ width: '100%', height: 'auto', borderRadius: '1rem', display: 'block' }}
-              />
-            </div>
-          </div>
-        </section>
-
-        {/* ── WORLDWIDE TRENDS ── */}
-        <section className="py-14 px-4" style={{ background: 'var(--bg-secondary)' }}>
-          <div className="max-w-4xl mx-auto">
-            <h2 className="font-fraunces font-bold mb-6" style={{ fontSize: 'clamp(1.4rem,3vw,2rem)', color: 'var(--text-primary)' }}>
-              Popular Cat Breeds Worldwide Trends
-            </h2>
-            <p className="mb-6 leading-relaxed" style={{ color: 'var(--text-muted)' }}>
-              Cat popularity changes over time based on lifestyle trends and pet ownership patterns.
-            </p>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-              {[
-                { title: 'Most Owned Cat Breeds', icon: '🏆', content: 'Globally, breeds like Persian, Maine Coon, and British Shorthair remain consistently popular due to their adaptability and recognition.' },
-                { title: 'Regional Popularity', icon: '🌍', content: 'Some breeds are more popular in urban regions (apartment-friendly cats), others preferred in larger homes (active or large breeds).' },
-                { title: 'Adoption vs Pedigree', icon: '🏠', content: 'Many people adopt mixed breed domestic cats, while purebred cats remain popular for their predictable traits.' },
-              ].map(({ title, icon, content }) => (
-                <div key={title} className="rounded-2xl p-5" style={{ background: 'var(--bg-card)', border: '1px solid var(--border)' }}>
-                  <div className="text-2xl mb-3">{icon}</div>
-                  <h3 className="font-semibold mb-2 text-sm" style={{ color: 'var(--text-primary)' }}>{title}</h3>
-                  <p className="text-sm leading-relaxed" style={{ color: 'var(--text-muted)' }}>{content}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* ── FAQ ── */}
-        <section className="py-14 px-4">
-          <div className="max-w-4xl mx-auto">
-            <h2 className="font-fraunces font-bold mb-8 text-center" style={{ fontSize: 'clamp(1.4rem,3vw,2rem)', color: 'var(--text-primary)' }}>
-              FAQs – Popular Cat Breeds
-            </h2>
-            <div className="space-y-4">
-              {FAQS.map(({ q, a }) => (
-                <div key={q} className="rounded-2xl p-6" style={{ background: 'var(--bg-card)', border: '1px solid var(--border)' }}>
-                  <h3 className="font-semibold mb-3 flex items-start gap-2" style={{ color: 'var(--text-primary)' }}>
-                    <span style={{ color: 'var(--accent)', flexShrink: 0 }}>Q.</span>
-                    {q}
-                  </h3>
-                  <p className="text-sm leading-relaxed flex gap-2" style={{ color: 'var(--text-muted)' }}>
-                    <span style={{ color: 'var(--purple)', flexShrink: 0, fontWeight: 600 }}>A.</span>
-                    {a}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* ── CONCLUSION ── */}
-        <section className="py-14 px-4" style={{ background: 'linear-gradient(160deg, var(--bg-secondary) 0%, var(--bg-primary) 100%)' }}>
-          <div className="max-w-4xl mx-auto">
-            <h2 className="font-fraunces font-bold mb-6 text-center" style={{ fontSize: 'clamp(1.4rem,3vw,2rem)', color: 'var(--text-primary)' }}>
-              Conclusion – Choosing the Right Cat Breed
-            </h2>
-            <p className="text-center mb-10 leading-relaxed max-w-2xl mx-auto" style={{ color: 'var(--text-muted)' }}>
-              Choosing from the top 10 most popular cat breeds in the world is not about picking the most famous name — it is about finding the right fit.
-            </p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-10">
-              <div className="rounded-2xl p-6" style={{ background: 'var(--bg-card)', border: '1px solid var(--border)' }}>
-                <h3 className="font-fraunces font-semibold mb-4" style={{ color: 'var(--accent)' }}>Matching Breed with Lifestyle</h3>
-                <p className="text-sm mb-4" style={{ color: 'var(--text-muted)' }}>The best cat for you depends on:</p>
-                <ul className="space-y-2">
-                  {['Living space','Time available','Grooming preference','Desired personality'].map(i => (
-                    <li key={i} className="text-sm flex gap-2"><span style={{ color: 'var(--accent)' }}>→</span><span style={{ color: 'var(--text-muted)' }}>{i}</span></li>
-                  ))}
-                </ul>
-              </div>
-              <div className="rounded-2xl p-6" style={{ background: 'var(--bg-card)', border: '1px solid var(--border)' }}>
-                <h3 className="font-fraunces font-semibold mb-4" style={{ color: 'var(--purple)' }}>Each Breed Offers Something Unique</h3>
-                <ul className="space-y-2">
-                  {[
-                    ['Persian','beauty and calm'],
-                    ['Maine Coon','size and friendliness'],
-                    ['Siamese','intelligence and communication'],
-                    ['Bengal','energy and activity'],
-                    ['British Shorthair','simplicity and balance'],
-                  ].map(([breed, trait]) => (
-                    <li key={breed} className="text-sm flex gap-2">
-                      <span style={{ color: 'var(--accent)' }}>🐱</span>
-                      <span style={{ color: 'var(--text-muted)' }}><strong style={{ color: 'var(--text-primary)' }}>{breed}</strong> → {trait}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-            <div className="text-center">
-              <p className="mb-6 leading-relaxed" style={{ color: 'var(--text-muted)' }}>
-                Ready to identify your cat&apos;s breed instantly? Try our free{' '}
-                <Link href="/" style={{ color: 'var(--accent)', fontWeight: 600, textDecoration: 'underline' }}>Cat Scanner</Link>{' '}
-                — no signup required.
-              </p>
-              <Link
-                href="/#scanner"
-                className="inline-flex items-center gap-2 px-8 py-4 rounded-full font-semibold text-white transition-all glow-orange"
-                style={{ background: 'var(--btn-primary)', fontSize: '1rem' }}
-              >
-                🐾 Scan Your Cat Free →
-              </Link>
-            </div>
-          </div>
-        </section>
-
-      </div>
-    </>
+    <ArticleView
+      post={{
+        slug: SLUG,
+        title: TITLE,
+        content: CONTENT,
+        excerpt: DESCRIPTION,
+        meta_title: TITLE,
+        meta_description: DESCRIPTION,
+        category: 'Breeds',
+        featured_image: IMAGE,
+        read_time: '12 min',
+        publish_date: '2026-03-26',
+        custom_schema: SCHEMA,
+      }}
+    />
   )
 }
