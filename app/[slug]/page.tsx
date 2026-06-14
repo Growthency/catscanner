@@ -88,11 +88,15 @@ function processContent(html: string): { intro: string; body: string; toc: { id:
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
   const post = await getPost(params.slug)
   if (!post) return { title: 'Article not found | CatScanner' }
+  const title = post.meta_title || post.title
+  const description = post.meta_description || post.excerpt || undefined
+  const images = post.featured_image ? [post.featured_image] : undefined
   return {
-    title: post.meta_title || post.title,
-    description: post.meta_description || post.excerpt || undefined,
+    title,
+    description,
     alternates: { canonical: `https://catscanner.org/${post.slug}` },
-    openGraph: { title: post.meta_title || post.title, description: post.meta_description || post.excerpt || undefined, images: post.featured_image ? [post.featured_image] : undefined, type: 'article' },
+    openGraph: { title, description, images, type: 'article', url: `https://catscanner.org/${post.slug}`, publishedTime: post.publish_date || undefined },
+    twitter: { card: 'summary_large_image', title, description, images },
   }
 }
 

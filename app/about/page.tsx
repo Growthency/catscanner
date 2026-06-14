@@ -1,7 +1,17 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 
-export const metadata: Metadata = { title: 'About' }
+export const metadata: Metadata = {
+  title: 'About',
+  description: 'Learn about CatScanner — the AI-powered cat breed identifier helping owners discover their cat’s breed from a single photo.',
+  alternates: { canonical: '/about' },
+  openGraph: {
+    title: 'About CatScanner',
+    description: 'The AI-powered cat breed identifier helping owners discover their cat’s breed from a single photo.',
+    url: 'https://catscanner.org/about',
+    type: 'website',
+  },
+}
 
 export default function AboutPage() {
   return (

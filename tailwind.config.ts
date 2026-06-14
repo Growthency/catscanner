@@ -13,7 +13,7 @@ const config: Config = {
         foreground: "var(--text-primary)",
       },
       fontFamily: {
-        fraunces: ['Fraunces', 'serif'],
+        fraunces: ['var(--font-fraunces)', 'serif'],
         jakarta: ['Plus Jakarta Sans', 'sans-serif'],
       },
     },

@@ -1,5 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Inter:wght@400;500;600;700;800&display=swap');
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -67,7 +65,7 @@ html {
 body {
   background: var(--bg-primary);
   color: var(--text-primary);
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family: var(--font-inter), -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   font-size: 1rem;
   line-height: 1.7;
   overflow-x: hidden;
@@ -81,10 +79,10 @@ body {
 }
 
 /* ─── TYPOGRAPHY ─── */
-.font-fraunces { font-family: 'Fraunces', Georgia, serif; }
+.font-fraunces { font-family: var(--font-fraunces), Georgia, serif; }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: 'Fraunces', Georgia, serif;
+  font-family: var(--font-fraunces), Georgia, serif;
   line-height: 1.15;
   letter-spacing: -0.02em;
   color: var(--text-primary);
