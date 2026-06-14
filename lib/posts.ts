@@ -24,8 +24,11 @@ export type Post = {
 
 export const POST_CATEGORIES = ['Guide', 'Breeds', 'Health', 'Insights', 'Technology']
 
-// Shown as the author avatar when a post has no author photo.
-export const DEFAULT_AUTHOR_PHOTO = '/icon.svg'
+// Default author persona shown on posts that don't set their own author.
+// Photo is a copyright-safe AI-generated portrait (a person who does not exist).
+export const DEFAULT_AUTHOR_PHOTO = '/author-avatar.webp'
+export const DEFAULT_AUTHOR_NAME = 'Dr. Marcus Bennett'
+export const DEFAULT_AUTHOR_ROLE = 'Feline Specialist'
 
 export const EMPTY_POST: Partial<Post> = {
   title: '',
@@ -37,8 +40,8 @@ export const EMPTY_POST: Partial<Post> = {
   meta_description: '',
   tags: '',
   category: 'Guide',
-  author_name: 'CatScanner Team',
-  author_role: 'Cat Specialist',
+  author_name: DEFAULT_AUTHOR_NAME,
+  author_role: DEFAULT_AUTHOR_ROLE,
   author_photo: '',
   access_type: 'free',
   status: 'draft',

@@ -5,7 +5,7 @@ import type { Metadata } from 'next'
 import { Clock, Calendar, ChevronRight, ChevronDown, Lock, ArrowRight, List, Sparkles, Eye } from 'lucide-react'
 import { createServerClient } from '@/lib/supabase-server'
 import { BLOG_POSTS } from '@/lib/blog-posts'
-import { slugify, DEFAULT_AUTHOR_PHOTO, type Post } from '@/lib/posts'
+import { slugify, DEFAULT_AUTHOR_PHOTO, DEFAULT_AUTHOR_NAME, DEFAULT_AUTHOR_ROLE, type Post } from '@/lib/posts'
 import ViewTracker from '@/components/ViewTracker'
 import BookmarkButton from '@/components/BookmarkButton'
 
@@ -130,8 +130,8 @@ export default async function ArticlePage({ params }: { params: { slug: string }
           <div className="flex items-center gap-3 p-3 rounded-2xl mb-3" style={{ background: 'var(--bg-card)', border: '1px solid var(--border)' }}>
             <img src={post.author_photo || DEFAULT_AUTHOR_PHOTO} alt={post.author_name} className="w-11 h-11 rounded-full object-cover" style={{ border: '1px solid var(--border)', background: 'var(--bg-secondary)' }} />
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>{post.author_name || 'CatScanner Team'}</p>
-              <p className="text-xs" style={{ color: 'var(--text-faint)' }}>{post.author_role || 'Cat Specialist'}</p>
+              <p className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>{post.author_name || DEFAULT_AUTHOR_NAME}</p>
+              <p className="text-xs" style={{ color: 'var(--text-faint)' }}>{post.author_role || DEFAULT_AUTHOR_ROLE}</p>
             </div>
             <div className="text-right text-xs" style={{ color: 'var(--text-faint)' }}>
               <p>Updated</p>
@@ -188,8 +188,8 @@ export default async function ArticlePage({ params }: { params: { slug: string }
             {/* Author bio */}
             <div className="rounded-2xl p-6 text-center" style={{ background: 'var(--bg-card)', border: '1px solid var(--border)' }}>
               <img src={post.author_photo || DEFAULT_AUTHOR_PHOTO} alt={post.author_name} className="w-20 h-20 rounded-full object-cover mx-auto mb-3" style={{ border: '2px solid var(--accent)', background: 'var(--bg-secondary)' }} />
-              <p className="font-bold" style={{ color: 'var(--text-primary)' }}>{post.author_name || 'CatScanner Team'}</p>
-              <span className="inline-block text-xs font-semibold px-2.5 py-1 rounded-full my-2" style={{ background: 'var(--accent-bg)', color: 'var(--accent)' }}>🐾 {post.author_role || 'Cat Specialist'}</span>
+              <p className="font-bold" style={{ color: 'var(--text-primary)' }}>{post.author_name || DEFAULT_AUTHOR_NAME}</p>
+              <span className="inline-block text-xs font-semibold px-2.5 py-1 rounded-full my-2" style={{ background: 'var(--accent-bg)', color: 'var(--accent)' }}>🐾 {post.author_role || DEFAULT_AUTHOR_ROLE}</span>
               <p className="text-sm leading-relaxed" style={{ color: 'var(--text-muted)' }}>Part of the CatScanner team — helping owners identify breeds and care for their cats with AI.</p>
               <Link href="/about" className="inline-flex items-center gap-1 text-sm font-semibold mt-3" style={{ color: 'var(--accent)' }}>More about us <ChevronRight size={14} /></Link>
             </div>
