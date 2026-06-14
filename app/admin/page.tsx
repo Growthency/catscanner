@@ -36,6 +36,7 @@ export default function AdminDashboard() {
   const [error, setError] = useState<string | null>(null)
   const [openRange, setOpenRange] = useState(false)
   const [openMetric, setOpenMetric] = useState(false)
+  const [hover, setHover] = useState<{ i: number; a: number; b: number; date: string } | null>(null)
 
   const load = useCallback(async () => {
     setLoading(true); setError(null)
@@ -53,17 +54,21 @@ export default function AdminDashboard() {
   useEffect(() => { load() }, [load])
 
   const d = connected && data ? data : null
-  const chartData: { a: number; b: number }[] = useMemo(() => {
+  const chartData: { date: string; a: number; b: number }[] = useMemo(() => {
     if (!d) return []
-    if (metric === 'clicks') return (d.clicksChart || []).map((c: any) => ({ a: Number(c.value) || 0, b: 0 }))
+    const users = (d.usersChart || []) as { date: string; value: number }[]
+    const clicks = (d.clicksChart || []) as { date: string; value: number }[]
+    if (metric === 'clicks') return clicks.map((c) => ({ date: c.date, a: Number(c.value) || 0, b: 0 }))
     if (metric === 'both') {
-      const cm: Record<string, number> = Object.fromEntries((d.clicksChart || []).map((c: any) => [c.date, Number(c.value) || 0]))
-      return (d.usersChart || []).map((u: any) => ({ a: Number(u.value) || 0, b: cm[u.date] || 0 }))
+      const cm: Record<string, number> = Object.fromEntries(clicks.map((c) => [c.date, Number(c.value) || 0]))
+      return users.map((u) => ({ date: u.date, a: Number(u.value) || 0, b: cm[u.date] || 0 }))
     }
-    return (d.usersChart || []).map((u: any) => ({ a: Number(u.value) || 0, b: 0 }))
+    return users.map((u) => ({ date: u.date, a: Number(u.value) || 0, b: 0 }))
   }, [d, metric])
 
-  const maxChart = Math.max(1, ...chartData.flatMap((c: { a: number; b: number }) => [c.a, c.b]))
+  const maxChart = Math.max(1, ...chartData.flatMap((c) => [c.a, c.b]))
+  const hasData = chartData.some((c) => c.a > 0 || c.b > 0)
+  const md = (s: string) => { const p = String(s).split('-'); return p.length === 3 ? `${+p[1]}/${+p[2]}` : s }
   const maxCountry = Math.max(1, ...((d?.topCountries || []).map((c: any) => c.users)))
   const rangeLabel = RANGES.find((r) => r[0] === range)?.[1] || 'Last 30 Days'
   const metricLabel = METRICS.find((m) => m[0] === metric)?.[1] || 'Daily Active Users'
@@ -138,19 +143,27 @@ export default function AdminDashboard() {
         </div>
         {loading ? (
           <div className="h-52 flex items-center justify-center" style={{ color: C.muted }}><Loader2 className="animate-spin" /></div>
-        ) : chartData.length === 0 ? (
+        ) : !hasData ? (
           <div className="h-52 flex flex-col items-center justify-center text-center" style={{ color: C.faint }}>
             <BarChart3 size={28} className="mb-2" />
             <p className="text-sm">No analytics data yet.</p>
           </div>
         ) : (
-          <div className="flex items-end gap-1 h-52">
-            {chartData.map((c, i) => (
-              <div key={i} className="flex-1 flex items-end gap-0.5 h-full">
-                <div className="flex-1 rounded-t" style={{ height: `${Math.max(2, (c.a / maxChart) * 100)}%`, background: `linear-gradient(to top, ${C.accent}, #fdba74)` }} />
-                {metric === 'both' && <div className="flex-1 rounded-t" style={{ height: `${Math.max(2, (c.b / maxChart) * 100)}%`, background: '#3b82f6' }} />}
+          <div className="relative h-52" onMouseLeave={() => setHover(null)}>
+            {hover && (
+              <div className="pointer-events-none absolute z-20 px-2 py-1 rounded-lg text-xs font-semibold whitespace-nowrap"
+                style={{ left: `${((hover.i + 0.5) / chartData.length) * 100}%`, bottom: `${Math.min(90, Math.max(2, (Math.max(hover.a, hover.b) / maxChart) * 100))}%`, transform: 'translate(-50%, -8px)', background: C.text, color: '#fff', boxShadow: '0 4px 14px rgba(0,0,0,0.2)' }}>
+                {metric === 'both' ? `${hover.a} / ${hover.b}` : hover.a} · {md(hover.date)}
               </div>
-            ))}
+            )}
+            <div className="flex items-end gap-1 h-full">
+              {chartData.map((c, i) => (
+                <div key={i} className="flex-1 flex items-end gap-0.5 h-full cursor-default" onMouseEnter={() => setHover({ i, a: c.a, b: c.b, date: c.date })}>
+                  <div className="flex-1 rounded-t transition-opacity" style={{ height: `${Math.max(2, (c.a / maxChart) * 100)}%`, background: `linear-gradient(to top, ${C.accent}, #fdba74)`, opacity: hover && hover.i !== i ? 0.5 : 1 }} />
+                  {metric === 'both' && <div className="flex-1 rounded-t transition-opacity" style={{ height: `${Math.max(2, (c.b / maxChart) * 100)}%`, background: '#3b82f6', opacity: hover && hover.i !== i ? 0.5 : 1 }} />}
+                </div>
+              ))}
+            </div>
           </div>
         )}
       </div>

@@ -7,7 +7,7 @@ import { ADMIN as C } from '@/lib/admin-theme'
 import { POST_CATEGORIES, EMPTY_POST, slugify, DEFAULT_AUTHOR_PHOTO, type Post } from '@/lib/posts'
 import RichTextEditor from './RichTextEditor'
 import ImageUpload from './ImageUpload'
-import { ArrowLeft, Save, Send, Search, Loader2 } from 'lucide-react'
+import { ArrowLeft, Save, Send, Search, Loader2, X, Plus } from 'lucide-react'
 
 const cardStyle = { background: C.card, border: `1px solid ${C.border}` }
 const labelStyle = { color: C.text }
@@ -30,8 +30,49 @@ export default function PageEditor({ postId }: { postId?: string }) {
   const [loading, setLoading] = useState(!!postId)
   const [saving, setSaving] = useState<false | 'draft' | 'publish'>(false)
   const [error, setError] = useState<string | null>(null)
+  const [categories, setCategories] = useState<string[]>(POST_CATEGORIES)
+  const [newCat, setNewCat] = useState('')
 
   const set = useCallback((patch: Partial<Post>) => setForm((f) => ({ ...f, ...patch })), [])
+
+  // Load the editable category list (falls back to the built-in defaults).
+  useEffect(() => {
+    ;(async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession()
+        const res = await fetch('/api/admin/settings', { headers: { Authorization: `Bearer ${session?.access_token}` } })
+        const j = await res.json()
+        const arr = JSON.parse(j.settings?.post_categories || 'null')
+        if (Array.isArray(arr) && arr.length) setCategories(arr)
+      } catch {}
+    })()
+  }, [])
+
+  async function persistCategories(next: string[]) {
+    setCategories(next)
+    try {
+      const { data: { session } } = await supabase.auth.getSession()
+      await fetch('/api/admin/settings', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session?.access_token}` },
+        body: JSON.stringify({ settings: { post_categories: JSON.stringify(next) } }),
+      })
+    } catch {}
+  }
+
+  function addCategory() {
+    const name = newCat.trim()
+    if (!name || categories.includes(name)) { setNewCat(''); return }
+    persistCategories([...categories, name])
+    set({ category: name })
+    setNewCat('')
+  }
+
+  function removeCategory(c: string) {
+    const next = categories.filter((x) => x !== c)
+    persistCategories(next)
+    if (form.category === c) set({ category: next[0] || '' })
+  }
 
   // Load existing post when editing.
   useEffect(() => {
@@ -190,11 +231,11 @@ export default function PageEditor({ postId }: { postId?: string }) {
           <div className="rounded-2xl p-5 space-y-4" style={cardStyle}>
             <h3 className="text-sm font-semibold" style={labelStyle}>Author</h3>
             <Field label="Name">
-              <input value={form.author_name || ''} onChange={(e) => set({ author_name: e.target.value })} placeholder="CatScanner Team"
+              <input value={form.author_name || ''} onChange={(e) => set({ author_name: e.target.value })} placeholder="Dr. Marcus Bennett"
                 className="w-full px-3 py-2.5 rounded-lg outline-none text-sm" style={inputStyle} />
             </Field>
             <Field label="Role">
-              <input value={form.author_role || ''} onChange={(e) => set({ author_role: e.target.value })} placeholder="Cat Specialist"
+              <input value={form.author_role || ''} onChange={(e) => set({ author_role: e.target.value })} placeholder="Feline Specialist"
                 className="w-full px-3 py-2.5 rounded-lg outline-none text-sm" style={inputStyle} />
             </Field>
             <div>
@@ -205,17 +246,33 @@ export default function PageEditor({ postId }: { postId?: string }) {
                   className="flex-1 px-3 py-2 rounded-lg outline-none text-sm" style={inputStyle} />
                 <ImageUpload onUploaded={(url) => set({ author_photo: url })} label="" />
               </div>
-              <p className="text-xs mt-1" style={{ color: C.faint }}>Empty = default cat avatar.</p>
+              <p className="text-xs mt-1" style={{ color: C.faint }}>Empty = default author photo (Dr. Marcus Bennett).</p>
             </div>
           </div>
 
           {/* Meta */}
           <div className="rounded-2xl p-5 space-y-4" style={cardStyle}>
-            <Field label="Category">
-              <select value={form.category || 'Guide'} onChange={(e) => set({ category: e.target.value })}
+            <Field label="Category" hint="Add or remove categories — shared across all posts.">
+              <select value={form.category || ''} onChange={(e) => set({ category: e.target.value })}
                 className="w-full px-3 py-2.5 rounded-lg outline-none text-sm" style={inputStyle}>
-                {POST_CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
+                {!categories.length && <option value="">No categories yet</option>}
+                {categories.map((c) => <option key={c} value={c}>{c}</option>)}
               </select>
+              {categories.length > 0 && (
+                <div className="flex flex-wrap gap-1.5 mt-2">
+                  {categories.map((c) => (
+                    <span key={c} className="inline-flex items-center gap-1 pl-2.5 pr-1.5 py-0.5 rounded-full text-xs" style={{ background: C.bg, border: `1px solid ${C.border}`, color: C.muted }}>
+                      {c}
+                      <button type="button" onClick={() => removeCategory(c)} title={`Delete "${c}"`} className="hover:opacity-70" style={{ color: '#ef4444' }}><X size={12} /></button>
+                    </span>
+                  ))}
+                </div>
+              )}
+              <div className="flex items-center gap-2 mt-2">
+                <input value={newCat} onChange={(e) => setNewCat(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addCategory() } }}
+                  placeholder="New category name" className="flex-1 px-3 py-2 rounded-lg outline-none text-sm" style={inputStyle} />
+                <button type="button" onClick={addCategory} className="flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-medium text-white shrink-0" style={{ background: C.accent }}><Plus size={14} /> Add</button>
+              </div>
             </Field>
             <Field label="Read time">
               <input value={form.read_time || ''} onChange={(e) => set({ read_time: e.target.value })} placeholder="5 min"

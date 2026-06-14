@@ -6,6 +6,31 @@ export const maxDuration = 30
 
 const num = (v: any) => Math.round(Number(v) || 0)
 const iso = (d: Date) => d.toISOString().slice(0, 10)
+const normDate = (s: string) => (/^\d{8}$/.test(s) ? `${s.slice(0, 4)}-${s.slice(4, 6)}-${s.slice(6, 8)}` : s)
+
+// Turn a sparse [{date,value}] list into a continuous series across the whole
+// window (missing days filled with 0) so the chart always shows a full bar set
+// instead of one stretched bar. Long windows bucket by week/month.
+function buildSeries(sparse: { date: string; value: number }[], startDate: string, endDate: string): { date: string; value: number }[] {
+  const map: Record<string, number> = {}
+  for (const r of sparse) { const k = normDate(r.date); map[k] = (map[k] || 0) + (Number(r.value) || 0) }
+  const days: string[] = []
+  let t = Date.parse(`${startDate}T00:00:00Z`)
+  const end = Date.parse(`${endDate}T00:00:00Z`)
+  while (t <= end) { days.push(iso(new Date(t))); t += 86400000 }
+  if (!days.length) return sparse
+  const bucket: 'day' | 'week' | 'month' = days.length <= 70 ? 'day' : days.length <= 400 ? 'week' : 'month'
+  if (bucket === 'day') return days.map((d) => ({ date: d, value: map[d] || 0 }))
+  const agg: Record<string, number> = {}
+  const order: string[] = []
+  for (const d of days) {
+    const ms = Date.parse(`${d}T00:00:00Z`)
+    const key = bucket === 'week' ? iso(new Date(ms - ((new Date(ms).getUTCDay() + 6) % 7) * 86400000)) : `${d.slice(0, 7)}-01`
+    if (!(key in agg)) { agg[key] = 0; order.push(key) }
+    agg[key] += map[d] || 0
+  }
+  return order.map((k) => ({ date: k, value: agg[k] }))
+}
 
 function rangeToDates(range: string): { startDate: string; endDate: string } {
   const today = new Date()
@@ -75,8 +100,8 @@ export async function GET(req: NextRequest) {
     users: num(s[0]?.value), newUsers: num(s[1]?.value), sessions: num(s[2]?.value), pageViews: num(s[3]?.value),
     today: num(today?.rows?.[0]?.metricValues?.[0]?.value),
     users7d: num(seven?.rows?.[0]?.metricValues?.[0]?.value),
-    usersChart: (usersChart?.rows || []).map((row: any) => ({ date: row.dimensionValues[0].value, value: num(row.metricValues[0].value) })),
-    clicksChart: clicksChart || [],
+    usersChart: buildSeries((usersChart?.rows || []).map((row: any) => ({ date: row.dimensionValues[0].value, value: num(row.metricValues[0].value) })), dr.startDate, dr.endDate),
+    clicksChart: buildSeries(clicksChart || [], dr.startDate, dr.endDate),
     topPages: (pages?.rows || []).map((row: any) => ({ path: row.dimensionValues[0].value, views: num(row.metricValues[0].value) })),
     topCountries: (countries?.rows || []).map((row: any) => ({ name: row.dimensionValues[0].value, users: num(row.metricValues[0].value) })),
   })
