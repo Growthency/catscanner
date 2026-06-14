@@ -20,7 +20,7 @@ export default function BlogPage() {
       .then(({ data }) => {
         if (!data) return
         setDbPosts(data.map((p: any) => ({
-          slug: `/blog/${p.slug}`,
+          slug: `/${p.slug}`,
           title: p.title,
           excerpt: p.excerpt || p.meta_description || '',
           category: p.category || 'Guide',

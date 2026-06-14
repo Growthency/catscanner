@@ -48,14 +48,14 @@ export default function SavedPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {items.map((a) => (
             <div key={a.id} className="rounded-2xl overflow-hidden flex flex-col card-lift" style={{ background: 'var(--bg-card)', border: '1px solid var(--border)' }}>
-              <Link href={a.href || `/blog/${a.slug}`} className="block">
+              <Link href={a.href || `/${a.slug}`} className="block">
                 <div className="h-40 overflow-hidden" style={{ background: 'var(--bg-secondary)' }}>
                   {a.image ? <img src={a.image} alt={a.title} className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center text-5xl">🐱</div>}
                 </div>
               </Link>
               <div className="p-4 flex flex-col flex-1">
                 {a.category && <span className="self-start text-[11px] font-semibold px-2 py-0.5 rounded-full mb-2" style={{ background: 'var(--accent-bg)', color: 'var(--accent)' }}>{a.category}</span>}
-                <Link href={a.href || `/blog/${a.slug}`}>
+                <Link href={a.href || `/${a.slug}`}>
                   <h3 className="font-fraunces font-bold leading-snug mb-1.5 line-clamp-2" style={{ color: 'var(--text-primary)' }}>{a.title}</h3>
                 </Link>
                 {a.excerpt && <p className="text-xs leading-relaxed line-clamp-2 mb-3" style={{ color: 'var(--text-muted)' }}>{a.excerpt}</p>}

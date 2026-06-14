@@ -132,7 +132,7 @@ export default function AdminPages() {
               <div key={p.id} className="grid grid-cols-2 md:grid-cols-12 gap-3 px-5 py-3.5 items-center" style={{ borderTop: `1px solid ${C.border}` }}>
                 <div className="col-span-2 md:col-span-4 min-w-0">
                   <p className="text-sm font-medium truncate" style={{ color: C.text }}>{p.title || 'Untitled'}</p>
-                  <p className="text-xs truncate" style={{ color: C.faint }}>/blog/{p.slug}</p>
+                  <p className="text-xs truncate" style={{ color: C.faint }}>/{p.slug}</p>
                 </div>
                 <span className="hidden md:block col-span-2 text-sm truncate" style={{ color: C.muted }}>{p.category}</span>
                 <span className="hidden md:block col-span-1 text-xs font-medium capitalize" style={{ color: p.access_type === 'premium' ? '#7c3aed' : '#16a34a' }}>{p.access_type}</span>
@@ -140,8 +140,8 @@ export default function AdminPages() {
                 <span className="hidden md:block col-span-2 text-sm" style={{ color: C.muted }}>{fmt(p.publish_date || p.created_at)}</span>
                 <span className="hidden md:flex col-span-1 items-center justify-center gap-1 text-sm" style={{ color: C.muted }}><Link2 size={12} /> {linkCount(p.content)}</span>
                 <div className="col-span-2 md:col-span-1 flex items-center justify-end gap-0.5">
-                  {st === 'published' && <a href={`/blog/${p.slug}`} target="_blank" rel="noreferrer" title="View" className="p-1.5 rounded-lg hover:bg-black/5" style={{ color: C.muted }}><ExternalLink size={15} /></a>}
-                  <Link href={`/admin/pages/${p.id}/edit`} title="Edit" className="p-1.5 rounded-lg hover:bg-black/5" style={{ color: C.muted }}><Pencil size={15} /></Link>
+                  {st === 'published' && <a href={`/${p.slug}`} target="_blank" rel="noreferrer" title="View" className="p-1.5 rounded-lg hover:bg-black/5" style={{ color: C.muted }}><ExternalLink size={15} /></a>}
+                  <Link href={`/admin/pages/edit?id=${p.id}`} title="Edit" className="p-1.5 rounded-lg hover:bg-black/5" style={{ color: C.muted }}><Pencil size={15} /></Link>
                   <button onClick={() => remove(p.id)} title="Delete" className="p-1.5 rounded-lg hover:bg-black/5" style={{ color: '#ef4444' }}><Trash2 size={15} /></button>
                 </div>
               </div>

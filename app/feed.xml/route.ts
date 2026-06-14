@@ -23,7 +23,7 @@ export async function GET() {
     for (const p of data || []) {
       items.push({
         title: p.title,
-        link: `${SITE}/blog/${p.slug}`,
+        link: `${SITE}/${p.slug}`,
         desc: p.excerpt || p.meta_description || '',
         date: p.publish_date || p.created_at,
       })

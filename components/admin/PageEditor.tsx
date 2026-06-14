@@ -122,7 +122,7 @@ export default function PageEditor({ postId }: { postId?: string }) {
           <div className="rounded-2xl p-5" style={cardStyle}>
             <Field label="Permalink" hint="The web address for this article.">
               <div className="flex items-center rounded-lg overflow-hidden" style={{ border: `1px solid ${C.border}` }}>
-                <span className="px-3 py-2.5 text-sm whitespace-nowrap" style={{ background: C.bg, color: C.faint }}>catscanner.org/blog/</span>
+                <span className="px-3 py-2.5 text-sm whitespace-nowrap" style={{ background: C.bg, color: C.faint }}>catscanner.org/</span>
                 <input value={form.slug || ''} onChange={(e) => { setSlugTouched(true); set({ slug: slugify(e.target.value) }) }} placeholder="article-slug"
                   className="flex-1 px-3 py-2.5 outline-none text-sm" style={{ background: C.card, color: C.text }} />
               </div>
