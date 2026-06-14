@@ -1,6 +1,23 @@
+'use client'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import { supabase } from '@/lib/supabase'
 
 export default function Footer() {
+  const [s, setS] = useState<Record<string, string>>({})
+
+  useEffect(() => {
+    supabase.from('site_settings').select('key,value')
+      .in('key', ['footer_brand', 'footer_email', 'footer_copyright', 'footer_disclaimer'])
+      .then(({ data }) => { if (data) setS(Object.fromEntries(data.map((r: any) => [r.key, r.value]))) })
+  }, [])
+
+  const year = new Date().getFullYear()
+  const brand = s.footer_brand || 'AI-powered cat breed identification'
+  const email = s.footer_email || 'support@catscanner.org'
+  const copyright = s.footer_copyright || 'CatScanner.org · English · For informational purposes only'
+  const disclaimer = s.footer_disclaimer || 'CatScanner.org results are for informational purposes only. Always consult a veterinarian for medical advice.'
+
   return (
     <footer style={{ background: 'var(--bg-secondary)', borderTop: '1px solid var(--border)' }}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -12,8 +29,8 @@ export default function Footer() {
               <span style={{ color: 'var(--text-primary)' }}>Cat</span>
               <span style={{ color: 'var(--accent)' }}>Scanner</span>
             </Link>
-            <p className="text-sm mb-4" style={{ color: 'var(--text-muted)' }}>AI-powered cat breed identification</p>
-            <p className="text-sm" style={{ color: 'var(--text-faint)' }}>support@catscanner.org</p>
+            <p className="text-sm mb-4" style={{ color: 'var(--text-muted)' }}>{brand}</p>
+            <p className="text-sm" style={{ color: 'var(--text-faint)' }}>{email}</p>
             <p className="text-sm mt-1" style={{ color: 'var(--text-faint)' }}>Discord community</p>
           </div>
 
@@ -55,15 +72,13 @@ export default function Footer() {
         </div>
 
         <div className="mt-10 pt-6 flex flex-col md:flex-row items-center justify-between gap-4" style={{ borderTop: '1px solid var(--border)' }}>
-          <p className="text-sm" style={{ color: 'var(--text-faint)' }}>© 2026 CatScanner.org · English · For informational purposes only</p>
+          <p className="text-sm" style={{ color: 'var(--text-faint)' }}>© {year} {copyright}</p>
         </div>
       </div>
 
       {/* Disclaimer bar — very bottom */}
       <div className="py-3 text-center" style={{ background: 'var(--accent-bg)', borderTop: '1px solid var(--border)' }}>
-        <p className="text-sm px-4" style={{ color: 'var(--text-muted)' }}>
-          🐾 CatScanner.org results are for informational purposes only. Always consult a veterinarian for medical advice.
-        </p>
+        <p className="text-sm px-4" style={{ color: 'var(--text-muted)' }}>🐾 {disclaimer}</p>
       </div>
     </footer>
   )

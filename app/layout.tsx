@@ -4,6 +4,7 @@ import { ThemeProvider } from '@/components/providers/ThemeProvider'
 import SiteChrome from '@/components/layout/SiteChrome'
 import ScrollToTop from '@/components/ui/ScrollToTop'
 import HeaderScripts from '@/components/HeaderScripts'
+import SiteCustomization from '@/components/SiteCustomization'
 import './globals.css'
 
 export const metadata: Metadata = {
@@ -40,6 +41,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             gtag('config', 'G-TQ3M8D23N7');
           `}
         </Script>
+        <SiteCustomization />
       </head>
       <body suppressHydrationWarning>
         <ThemeProvider>

@@ -1,5 +1,5 @@
 'use client'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import { ADMIN as C } from '@/lib/admin-theme'
 import {
@@ -12,23 +12,8 @@ const RANGES: [string, string][] = [
   ['lastMonth', 'Last Month'], ['365d', 'Last 365 Days'], ['lifetime', 'Lifetime'],
 ]
 const METRICS: [string, string][] = [
-  ['activeUsers', 'Active Users'], ['sessions', 'Sessions'], ['screenPageViews', 'Page Views'],
+  ['users', 'Daily Active Users'], ['clicks', 'Daily Active Clicks'], ['both', 'Clicks vs Users'],
 ]
-
-// Sample fallback — shown until Google Analytics is connected.
-const SAMPLE = {
-  users: 903, users7d: 359, today: 63, newUsers: 896, sessions: 1173, pageViews: 2046,
-  chart: [38, 32, 40, 44, 48, 36, 30, 33, 28, 30, 46, 40, 55, 30, 28, 60, 58, 64, 72, 70, 62, 66, 74, 68, 56, 78, 82, 76, 80, 88, 100].map((v) => ({ date: '', value: v })),
-  topPages: [
-    { path: '/', views: 412 }, { path: '/most-popular-cat-breeds-in-the-world', views: 146 },
-    { path: '/how-to-use-cat-breed-scanner', views: 98 }, { path: '/how-to-identify-mixed-breed-cat', views: 76 },
-    { path: '/pricing', views: 44 },
-  ],
-  topCountries: [
-    { name: 'United States', users: 506 }, { name: 'Singapore', users: 101 }, { name: 'Australia', users: 59 },
-    { name: 'United Kingdom', users: 48 }, { name: 'Canada', users: 37 },
-  ],
-}
 
 function StatCard({ label, value, Icon }: { label: string; value: number; Icon: any }) {
   return (
@@ -44,7 +29,7 @@ function StatCard({ label, value, Icon }: { label: string; value: number; Icon: 
 
 export default function AdminDashboard() {
   const [range, setRange] = useState('30d')
-  const [metric, setMetric] = useState('activeUsers')
+  const [metric, setMetric] = useState('users')
   const [data, setData] = useState<any>(null)
   const [connected, setConnected] = useState(false)
   const [loading, setLoading] = useState(true)
@@ -56,23 +41,32 @@ export default function AdminDashboard() {
     setLoading(true); setError(null)
     const { data: { session } } = await supabase.auth.getSession()
     try {
-      const res = await fetch(`/api/admin/analytics?range=${range}&metric=${metric}`, { headers: { Authorization: `Bearer ${session?.access_token}` } })
+      const res = await fetch(`/api/admin/analytics?range=${range}`, { headers: { Authorization: `Bearer ${session?.access_token}` } })
       const d = await res.json()
       setConnected(!!d.connected)
       if (d.connected) setData(d)
       else { setData(null); setError(d.error || null) }
     } catch { setConnected(false); setData(null) }
     setLoading(false)
-  }, [range, metric])
+  }, [range])
 
   useEffect(() => { load() }, [load])
 
-  const v = connected && data ? data : SAMPLE
-  const chart: { value: number }[] = v.chart || []
-  const maxChart = Math.max(1, ...chart.map((c) => c.value))
-  const maxCountry = Math.max(1, ...(v.topCountries || []).map((c: any) => c.users))
+  const d = connected && data ? data : null
+  const chartData: { a: number; b: number }[] = useMemo(() => {
+    if (!d) return []
+    if (metric === 'clicks') return (d.clicksChart || []).map((c: any) => ({ a: Number(c.value) || 0, b: 0 }))
+    if (metric === 'both') {
+      const cm: Record<string, number> = Object.fromEntries((d.clicksChart || []).map((c: any) => [c.date, Number(c.value) || 0]))
+      return (d.usersChart || []).map((u: any) => ({ a: Number(u.value) || 0, b: cm[u.date] || 0 }))
+    }
+    return (d.usersChart || []).map((u: any) => ({ a: Number(u.value) || 0, b: 0 }))
+  }, [d, metric])
+
+  const maxChart = Math.max(1, ...chartData.flatMap((c: { a: number; b: number }) => [c.a, c.b]))
+  const maxCountry = Math.max(1, ...((d?.topCountries || []).map((c: any) => c.users)))
   const rangeLabel = RANGES.find((r) => r[0] === range)?.[1] || 'Last 30 Days'
-  const metricLabel = METRICS.find((m) => m[0] === metric)?.[1] || 'Active Users'
+  const metricLabel = METRICS.find((m) => m[0] === metric)?.[1] || 'Daily Active Users'
   const card = { background: C.card, border: `1px solid ${C.border}` }
 
   function Dropdown({ open, setOpen, label, icon: Icon, options, onPick, current }: any) {
@@ -82,7 +76,7 @@ export default function AdminDashboard() {
           {Icon && <Icon size={15} />} {label} <ChevronDown size={15} />
         </button>
         {open && (
-          <div className="absolute right-0 mt-1 z-20 rounded-lg overflow-hidden min-w-[170px]" style={{ background: C.card, border: `1px solid ${C.border}`, boxShadow: '0 8px 24px rgba(0,0,0,0.08)' }}>
+          <div className="absolute right-0 mt-1 z-20 rounded-lg overflow-hidden min-w-[180px]" style={{ background: C.card, border: `1px solid ${C.border}`, boxShadow: '0 8px 24px rgba(0,0,0,0.08)' }}>
             {options.map(([val, lbl]: [string, string]) => (
               <button key={val} onClick={() => { onPick(val); setOpen(false) }} className="block w-full text-left px-4 py-2 text-sm" style={{ color: current === val ? C.accent : C.text, background: current === val ? C.accentBg : 'transparent' }}>{lbl}</button>
             ))}
@@ -113,21 +107,21 @@ export default function AdminDashboard() {
 
       {!connected && !loading && (
         <div className="rounded-xl px-4 py-2.5 text-sm flex items-center gap-2" style={{ background: '#fffbeb', border: '1px solid #fde68a', color: '#b45309' }}>
-          <span>⚠️</span> Showing sample data. {error || 'Add GA4_PROPERTY_ID + GSC_SERVICE_ACCOUNT_JSON to show your live numbers here.'}
+          <span>⚠️</span> {error || 'No analytics data yet — add GA4_PROPERTY_ID + GSC_SERVICE_ACCOUNT_JSON in Vercel to show your live numbers.'}
         </div>
       )}
 
       {/* Stat cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard label={`Users (${rangeLabel.replace('Last ', '')})`} value={v.users} Icon={Users} />
-        <StatCard label="Users (7d)" value={v.users7d} Icon={Calendar} />
-        <StatCard label="Today" value={v.today} Icon={Clock} />
-        <StatCard label="New Users" value={v.newUsers} Icon={TrendingUp} />
+        <StatCard label={`Users (${rangeLabel.replace('Last ', '')})`} value={d?.users || 0} Icon={Users} />
+        <StatCard label="Users (7d)" value={d?.users7d || 0} Icon={Calendar} />
+        <StatCard label="Today" value={d?.today || 0} Icon={Clock} />
+        <StatCard label="New Users" value={d?.newUsers || 0} Icon={TrendingUp} />
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <StatCard label="Sessions" value={v.sessions} Icon={Activity} />
-        <StatCard label="Page Views" value={v.pageViews} Icon={Eye} />
-        <StatCard label="Total Active Users" value={v.users} Icon={Layers} />
+        <StatCard label="Sessions" value={d?.sessions || 0} Icon={Activity} />
+        <StatCard label="Page Views" value={d?.pageViews || 0} Icon={Eye} />
+        <StatCard label="Total Active Users" value={d?.users || 0} Icon={Layers} />
       </div>
 
       {/* Chart */}
@@ -137,16 +131,25 @@ export default function AdminDashboard() {
             <BarChart3 size={18} style={{ color: C.accent }} /> {metricLabel} — {rangeLabel}
           </h2>
           <div className="flex items-center gap-2">
+            {metric === 'both' && <span className="flex items-center gap-3 text-xs" style={{ color: C.faint }}><span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full" style={{ background: C.accent }} /> Users</span><span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full" style={{ background: '#3b82f6' }} /> Clicks</span></span>}
             <Dropdown open={openMetric} setOpen={setOpenMetric} label={metricLabel} icon={BarChart3} options={METRICS} current={metric} onPick={setMetric} />
-            <span className="text-xs hidden sm:inline" style={{ color: C.faint }}>from Google Analytics</span>
+            <span className="text-xs hidden sm:inline" style={{ color: C.faint }}>from Google</span>
           </div>
         </div>
         {loading ? (
           <div className="h-52 flex items-center justify-center" style={{ color: C.muted }}><Loader2 className="animate-spin" /></div>
+        ) : chartData.length === 0 ? (
+          <div className="h-52 flex flex-col items-center justify-center text-center" style={{ color: C.faint }}>
+            <BarChart3 size={28} className="mb-2" />
+            <p className="text-sm">No analytics data yet.</p>
+          </div>
         ) : (
           <div className="flex items-end gap-1 h-52">
-            {chart.map((c, i) => (
-              <div key={i} className="flex-1 rounded-t" style={{ height: `${Math.max(2, (c.value / maxChart) * 100)}%`, background: `linear-gradient(to top, ${C.accent}, #fdba74)`, opacity: 0.55 + (c.value / maxChart) * 0.45 }} title={String(c.value)} />
+            {chartData.map((c, i) => (
+              <div key={i} className="flex-1 flex items-end gap-0.5 h-full">
+                <div className="flex-1 rounded-t" style={{ height: `${Math.max(2, (c.a / maxChart) * 100)}%`, background: `linear-gradient(to top, ${C.accent}, #fdba74)` }} />
+                {metric === 'both' && <div className="flex-1 rounded-t" style={{ height: `${Math.max(2, (c.b / maxChart) * 100)}%`, background: '#3b82f6' }} />}
+              </div>
             ))}
           </div>
         )}
@@ -159,32 +162,40 @@ export default function AdminDashboard() {
             <h2 className="flex items-center gap-2 text-base font-semibold" style={{ color: C.text }}><FileText size={17} style={{ color: C.accent }} /> Top 25 Pages</h2>
             <span className="text-xs" style={{ color: C.faint }}>by pageviews</span>
           </div>
-          <div className="space-y-1">
-            {(v.topPages || []).map((p: any, i: number) => (
-              <div key={i} className="flex items-center gap-3 py-2.5" style={{ borderBottom: i < v.topPages.length - 1 ? `1px solid ${C.border}` : 'none' }}>
-                <span className="text-sm font-bold w-6 shrink-0" style={{ color: C.accent }}>#{i + 1}</span>
-                <p className="text-sm font-medium truncate flex-1" style={{ color: C.text }}>{p.path}</p>
-                <span className="flex items-center gap-1 text-sm font-semibold shrink-0" style={{ color: C.muted }}><Eye size={13} /> {p.views.toLocaleString()}</span>
-              </div>
-            ))}
-          </div>
+          {(d?.topPages || []).length === 0 ? (
+            <p className="py-8 text-center text-sm" style={{ color: C.faint }}>No data yet.</p>
+          ) : (
+            <div className="space-y-1">
+              {d.topPages.map((p: any, i: number) => (
+                <div key={i} className="flex items-center gap-3 py-2.5" style={{ borderBottom: i < d.topPages.length - 1 ? `1px solid ${C.border}` : 'none' }}>
+                  <span className="text-sm font-bold w-6 shrink-0" style={{ color: C.accent }}>#{i + 1}</span>
+                  <p className="text-sm font-medium truncate flex-1" style={{ color: C.text }}>{p.path}</p>
+                  <span className="flex items-center gap-1 text-sm font-semibold shrink-0" style={{ color: C.muted }}><Eye size={13} /> {p.views.toLocaleString()}</span>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
         <div className="rounded-2xl p-6" style={card}>
           <div className="flex items-center justify-between mb-4">
             <h2 className="flex items-center gap-2 text-base font-semibold" style={{ color: C.text }}><Globe size={17} style={{ color: C.accent }} /> Top 25 Countries</h2>
             <span className="text-xs" style={{ color: C.faint }}>by active users</span>
           </div>
-          <div className="space-y-3">
-            {(v.topCountries || []).map((c: any, i: number) => (
-              <div key={i} className="flex items-center gap-3">
-                <span className="text-sm font-bold w-6 shrink-0" style={{ color: C.accent }}>#{i + 1}</span>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between mb-1"><span className="text-sm font-medium" style={{ color: C.text }}>{c.name}</span><span className="text-sm font-semibold" style={{ color: C.muted }}>{c.users.toLocaleString()}</span></div>
-                  <div className="w-full h-1.5 rounded-full overflow-hidden" style={{ background: C.bg }}><div className="h-full rounded-full" style={{ width: `${(c.users / maxCountry) * 100}%`, background: C.accent }} /></div>
+          {(d?.topCountries || []).length === 0 ? (
+            <p className="py-8 text-center text-sm" style={{ color: C.faint }}>No data yet.</p>
+          ) : (
+            <div className="space-y-3">
+              {d.topCountries.map((c: any, i: number) => (
+                <div key={i} className="flex items-center gap-3">
+                  <span className="text-sm font-bold w-6 shrink-0" style={{ color: C.accent }}>#{i + 1}</span>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between mb-1"><span className="text-sm font-medium" style={{ color: C.text }}>{c.name}</span><span className="text-sm font-semibold" style={{ color: C.muted }}>{c.users.toLocaleString()}</span></div>
+                    <div className="w-full h-1.5 rounded-full overflow-hidden" style={{ background: C.bg }}><div className="h-full rounded-full" style={{ width: `${(c.users / maxCountry) * 100}%`, background: C.accent }} /></div>
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>
