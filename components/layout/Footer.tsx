@@ -1,7 +1,20 @@
 'use client'
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import { ShieldCheck } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
+
+// Accepted payment methods shown in the footer. Rendered as styled brand pills
+// (no image assets) — Paddle is our Merchant of Record for all checkout.
+const PAYMENTS: { label: string; bg: string; fg: string; html: string }[] = [
+  { label: 'Visa', bg: '#1A1F71', fg: '#ffffff', html: 'VISA' },
+  { label: 'Mastercard', bg: '#1f2937', fg: '#ffffff', html: '<span style="width:13px;height:13px;border-radius:9999px;display:inline-block;background:#EB001B"></span><span style="width:13px;height:13px;border-radius:9999px;display:inline-block;background:#F79E1B;margin-left:-6px"></span>' },
+  { label: 'PayPal', bg: '#003087', fg: '#ffffff', html: 'Pay<span style="color:#009CDE">Pal</span>' },
+  { label: 'American Express', bg: '#2E77BC', fg: '#ffffff', html: 'AMEX' },
+  { label: 'Apple Pay', bg: '#000000', fg: '#ffffff', html: 'Apple&nbsp;Pay' },
+  { label: 'Google Pay', bg: '#ffffff', fg: '#3c4043', html: 'G&nbsp;Pay' },
+  { label: 'Paddle', bg: '#0070E0', fg: '#ffffff', html: 'Paddle' },
+]
 
 export default function Footer() {
   const [s, setS] = useState<Record<string, string>>({})
@@ -62,17 +75,40 @@ export default function Footer() {
           <div>
             <h4 className="font-semibold mb-4" style={{ color: 'var(--text-primary)' }}>Legal</h4>
             <ul className="space-y-2">
-              {['Privacy Policy', 'Terms of Service', 'Cookie Policy', 'Refund Policy'].map(item => (
-                <li key={item}>
-                  <span className="text-sm cursor-pointer transition-colors hover:opacity-80" style={{ color: 'var(--text-muted)' }}>{item}</span>
+              {[{ label: 'Privacy Policy', href: '/privacy' }, { label: 'Terms of Service', href: '/terms' }, { label: 'Refund Policy', href: '/refund' }, { label: 'Contact', href: '/contact' }].map(item => (
+                <li key={item.href}>
+                  <Link href={item.href} className="text-sm transition-colors hover:opacity-80" style={{ color: 'var(--text-muted)' }}>{item.label}</Link>
                 </li>
               ))}
             </ul>
           </div>
         </div>
 
-        <div className="mt-10 pt-6 flex flex-col md:flex-row items-center justify-between gap-4" style={{ borderTop: '1px solid var(--border)' }}>
+        {/* Secure payment + accepted methods (Paddle Merchant of Record) */}
+        <div className="mt-10 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4" style={{ borderTop: '1px solid var(--border)' }}>
+          <div className="flex items-center gap-2 text-sm" style={{ color: 'var(--text-muted)' }}>
+            <ShieldCheck size={16} style={{ color: 'var(--accent)' }} /> Secure checkout · Powered by Paddle
+          </div>
+          <div className="flex items-center flex-wrap gap-2 justify-center">
+            <span className="text-xs font-medium mr-0.5" style={{ color: 'var(--text-faint)' }}>We accept</span>
+            {PAYMENTS.map(p => (
+              <span key={p.label} aria-label={p.label} title={p.label}
+                className="inline-flex items-center justify-center px-2.5 rounded-md text-[11px] font-bold leading-none select-none"
+                style={{ background: p.bg, color: p.fg, minWidth: 44, height: 24, border: '1px solid rgba(0,0,0,0.08)' }}
+                dangerouslySetInnerHTML={{ __html: p.html }} />
+            ))}
+          </div>
+        </div>
+
+        <div className="mt-6 flex flex-col md:flex-row items-center justify-between gap-3">
           <p className="text-sm" style={{ color: 'var(--text-faint)' }}>© {year} {copyright}</p>
+          <div className="flex items-center gap-3 text-xs">
+            <Link href="/privacy" className="hover:underline" style={{ color: 'var(--text-faint)' }}>Privacy</Link>
+            <span style={{ color: 'var(--text-faint)' }}>·</span>
+            <Link href="/terms" className="hover:underline" style={{ color: 'var(--text-faint)' }}>Terms</Link>
+            <span style={{ color: 'var(--text-faint)' }}>·</span>
+            <Link href="/refund" className="hover:underline" style={{ color: 'var(--text-faint)' }}>Refund</Link>
+          </div>
         </div>
       </div>
 
