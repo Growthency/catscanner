@@ -1,6 +1,6 @@
 import { cache } from 'react'
 import Link from 'next/link'
-import { ChevronRight, ChevronDown, Lock, ArrowRight, List, Sparkles, Eye, Clock } from 'lucide-react'
+import { ChevronRight, ChevronDown, ArrowRight, List, Sparkles, Eye, Clock, Crown, Check } from 'lucide-react'
 import { createServerClient } from '@/lib/supabase-server'
 import { BLOG_POSTS } from '@/lib/blog-posts'
 import { slugify, DEFAULT_AUTHOR_PHOTO, DEFAULT_AUTHOR_NAME, DEFAULT_AUTHOR_ROLE } from '@/lib/posts'
@@ -235,11 +235,21 @@ export default async function ArticleView({ post }: { post: ArticleData }) {
             )}
 
             {/* Premium */}
-            <div className="rounded-2xl p-6 text-white" style={{ background: 'linear-gradient(135deg, #f97316, #7c3aed)' }}>
-              <Sparkles size={22} className="mb-2" />
-              <h3 className="font-fraunces text-lg font-bold mb-1">Go Premium</h3>
-              <p className="text-sm mb-4" style={{ color: 'rgba(255,255,255,0.9)' }}>Unlock unlimited scans, full breed reports and scan history.</p>
-              <Link href="/pricing" className="flex items-center justify-center gap-2 w-full py-2.5 rounded-full font-semibold text-sm" style={{ background: '#fff', color: '#f97316' }}><Lock size={14} /> View Plans</Link>
+            <div className="rounded-2xl p-5 relative overflow-hidden" style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', boxShadow: '0 8px 30px rgba(124,58,237,0.10)' }}>
+              <div className="absolute top-0 left-0 right-0 h-1" style={{ background: 'linear-gradient(90deg, #f97316, #7c3aed)' }} />
+              <div className="flex items-center gap-2.5 mb-3 mt-1">
+                <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0" style={{ background: 'linear-gradient(135deg, #f97316, #7c3aed)' }}><Crown size={18} className="text-white" /></div>
+                <div className="min-w-0">
+                  <p className="font-fraunces font-bold leading-tight" style={{ color: 'var(--text-primary)' }}>Go Premium</p>
+                  <p className="text-[11px] font-semibold uppercase tracking-wide" style={{ color: 'var(--accent)' }}>Unlock everything</p>
+                </div>
+              </div>
+              <ul className="space-y-1.5 mb-4">
+                {['Unlimited cat scans', 'Full breed reports', 'Scan history & saved cats'].map((f) => (
+                  <li key={f} className="flex items-center gap-2 text-xs" style={{ color: 'var(--text-muted)' }}><Check size={13} className="shrink-0" style={{ color: 'var(--accent)' }} /> {f}</li>
+                ))}
+              </ul>
+              <Link href="/pricing" className="flex items-center justify-center gap-1.5 w-full py-2.5 rounded-xl font-semibold text-sm text-white glow-orange" style={{ background: 'linear-gradient(135deg, #f97316, #7c3aed)' }}>View Plans <ArrowRight size={15} /></Link>
             </div>
 
             {/* Recent */}
