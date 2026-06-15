@@ -59,6 +59,9 @@ export async function GET(req: NextRequest) {
   const range = new URL(req.url).searchParams.get('range') || '30d'
   const dr = rangeToDates(range)
   const site = process.env.GSC_SITE_URL || 'https://catscanner.org/'
+  let gscEmail = ''
+  try { gscEmail = JSON.parse(process.env.GSC_SERVICE_ACCOUNT_JSON || '{}').client_email || '' } catch {}
+  const gscState: { status: 'ok' | 'forbidden' | 'error' } = { status: 'error' }
 
   async function ga(body: any) {
     try {
@@ -74,10 +77,11 @@ export async function GET(req: NextRequest) {
         method: 'POST', headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({ startDate: dr.startDate, endDate: dr.endDate, dimensions: ['date'], rowLimit: 500 }),
       })
-      if (!r.ok) return null
+      if (!r.ok) { gscState.status = r.status === 403 ? 'forbidden' : 'error'; return null }
+      gscState.status = 'ok'
       const d = await r.json()
       return (d.rows || []).map((row: any) => ({ date: row.keys[0], value: num(row.clicks) }))
-    } catch { return null }
+    } catch { gscState.status = 'error'; return null }
   }
   async function searchConsoleTop(dimension: 'query' | 'page') {
     try {
@@ -110,6 +114,11 @@ export async function GET(req: NextRequest) {
   const s = summary.rows?.[0]?.metricValues || []
   return NextResponse.json({
     connected: true,
+    ga4Connected: true,
+    gscConnected: gscState.status === 'ok',
+    gscStatus: gscState.status,
+    gscEmail,
+    gscSite: site,
     users: num(s[0]?.value), newUsers: num(s[1]?.value), sessions: num(s[2]?.value), pageViews: num(s[3]?.value),
     today: num(today?.rows?.[0]?.metricValues?.[0]?.value),
     users7d: num(seven?.rows?.[0]?.metricValues?.[0]?.value),

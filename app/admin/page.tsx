@@ -108,12 +108,24 @@ export default function AdminDashboard() {
           <span className="flex items-center gap-1.5 text-sm font-medium" style={{ color: connected ? C.accent : C.faint }}>
             <span className="w-2 h-2 rounded-full" style={{ background: connected ? C.accent : C.faint }} /> GA4 {connected ? 'Connected' : 'Not connected'}
           </span>
+          <span className="flex items-center gap-1.5 text-sm font-medium" style={{ color: d?.gscConnected ? C.accent : '#d97706' }}>
+            <span className="w-2 h-2 rounded-full" style={{ background: d?.gscConnected ? C.accent : '#f59e0b' }} /> Search Console {d?.gscConnected ? 'Connected' : 'Not connected'}
+          </span>
         </div>
       </div>
 
       {!connected && !loading && (
         <div className="rounded-xl px-4 py-2.5 text-sm flex items-center gap-2" style={{ background: '#fffbeb', border: '1px solid #fde68a', color: '#b45309' }}>
           <span>⚠️</span> {error || 'No analytics data yet — add GA4_PROPERTY_ID + GSC_SERVICE_ACCOUNT_JSON in Vercel to show your live numbers.'}
+        </div>
+      )}
+
+      {connected && d && !d.gscConnected && !loading && (
+        <div className="rounded-xl px-4 py-3 text-sm" style={{ background: '#fffbeb', border: '1px solid #fde68a', color: '#b45309' }}>
+          <p className="font-semibold mb-1">⚠️ Google Search Console isn’t connected yet{d.gscStatus === 'forbidden' ? ' (the service account has no access to this property)' : ''}.</p>
+          <p>1. In Search Console → Settings → Users and permissions → Add user, add this service-account email with Full access:</p>
+          <p className="font-mono text-xs my-1 break-all px-2 py-1 rounded" style={{ background: '#fef3c7', color: '#92400e' }}>{d.gscEmail || 'the client_email from GSC_SERVICE_ACCOUNT_JSON'}</p>
+          <p>2. Make sure <code>GSC_SITE_URL</code> matches your property exactly — currently querying <code>{d.gscSite}</code>. For a Domain property use <code>sc-domain:catscanner.org</code>; for a URL-prefix property use <code>https://catscanner.org/</code>. Redeploy after changing env vars.</p>
         </div>
       )}
 
