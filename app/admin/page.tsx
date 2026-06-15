@@ -42,7 +42,7 @@ export default function AdminDashboard() {
     setLoading(true); setError(null)
     const { data: { session } } = await supabase.auth.getSession()
     try {
-      const res = await fetch(`/api/admin/analytics?range=${range}`, { headers: { Authorization: `Bearer ${session?.access_token}` } })
+      const res = await fetch(`/api/admin/analytics?range=${range}`, { cache: 'no-store', headers: { Authorization: `Bearer ${session?.access_token}` } })
       const d = await res.json()
       setConnected(!!d.connected)
       if (d.connected) setData(d)
@@ -191,7 +191,7 @@ export default function AdminDashboard() {
           {(d?.topPages || []).length === 0 ? (
             <p className="py-8 text-center text-sm" style={{ color: C.faint }}>No data yet.</p>
           ) : (
-            <div className="space-y-1">
+            <div className="space-y-1 pr-1" style={{ maxHeight: 300, overflowY: 'auto' }}>
               {d.topPages.map((p: any, i: number) => (
                 <div key={i} className="flex items-center gap-3 py-2.5" style={{ borderBottom: i < d.topPages.length - 1 ? `1px solid ${C.border}` : 'none' }}>
                   <span className="text-sm font-bold w-6 shrink-0" style={{ color: C.accent }}>#{i + 1}</span>
@@ -210,7 +210,7 @@ export default function AdminDashboard() {
           {(d?.topCountries || []).length === 0 ? (
             <p className="py-8 text-center text-sm" style={{ color: C.faint }}>No data yet.</p>
           ) : (
-            <div className="space-y-3">
+            <div className="space-y-3 pr-1" style={{ maxHeight: 300, overflowY: 'auto' }}>
               {d.topCountries.map((c: any, i: number) => (
                 <div key={i} className="flex items-center gap-3">
                   <span className="text-sm font-bold w-6 shrink-0" style={{ color: C.accent }}>#{i + 1}</span>
@@ -235,8 +235,8 @@ export default function AdminDashboard() {
           {(d?.searchKeywords || []).length === 0 ? (
             <p className="py-8 text-center text-sm" style={{ color: C.faint }}>No search data yet.</p>
           ) : (
-            <div>
-              <div className="grid grid-cols-12 gap-2 pb-2 text-[11px] font-semibold uppercase tracking-wide" style={{ color: C.faint, borderBottom: `1px solid ${C.border}` }}>
+            <div className="pr-1" style={{ maxHeight: 300, overflowY: 'auto' }}>
+              <div className="grid grid-cols-12 gap-2 pb-2 text-[11px] font-semibold uppercase tracking-wide sticky top-0" style={{ color: C.faint, borderBottom: `1px solid ${C.border}`, background: C.card }}>
                 <span className="col-span-6">Keyword</span><span className="col-span-2 text-right">Clicks</span><span className="col-span-2 text-right">Impr.</span><span className="col-span-2 text-right">Pos.</span>
               </div>
               {d.searchKeywords.map((k: any, i: number) => (
@@ -258,8 +258,8 @@ export default function AdminDashboard() {
           {(d?.searchPages || []).length === 0 ? (
             <p className="py-8 text-center text-sm" style={{ color: C.faint }}>No search data yet.</p>
           ) : (
-            <div>
-              <div className="grid grid-cols-12 gap-2 pb-2 text-[11px] font-semibold uppercase tracking-wide" style={{ color: C.faint, borderBottom: `1px solid ${C.border}` }}>
+            <div className="pr-1" style={{ maxHeight: 300, overflowY: 'auto' }}>
+              <div className="grid grid-cols-12 gap-2 pb-2 text-[11px] font-semibold uppercase tracking-wide sticky top-0" style={{ color: C.faint, borderBottom: `1px solid ${C.border}`, background: C.card }}>
                 <span className="col-span-6">Page</span><span className="col-span-2 text-right">Clicks</span><span className="col-span-2 text-right">Impr.</span><span className="col-span-2 text-right">Pos.</span>
               </div>
               {d.searchPages.map((k: any, i: number) => (

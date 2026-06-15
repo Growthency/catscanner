@@ -3,6 +3,8 @@ import { requireAdmin } from '@/lib/admin-auth'
 import { getGoogleAccessToken } from '@/lib/google-jwt'
 
 export const maxDuration = 30
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
 
 const num = (v: any) => Math.round(Number(v) || 0)
 const iso = (d: Date) => d.toISOString().slice(0, 10)
@@ -112,6 +114,12 @@ export async function GET(req: NextRequest) {
   }
 
   const s = summary.rows?.[0]?.metricValues || []
+  const usersSeries = buildSeries((usersChart?.rows || []).map((row: any) => ({ date: row.dimensionValues[0].value, value: num(row.metricValues[0].value) })), dr.startDate, dr.endDate)
+  let clicksSeries = buildSeries(clicksChart || [], dr.startDate, dr.endDate)
+  // Search Console data lags ~2-3 days; drop the empty trailing days so the
+  // clicks chart ends at the latest day that actually has data.
+  const lastClickIdx = clicksSeries.reduce((acc, c, i) => (c.value > 0 ? i : acc), -1)
+  if (lastClickIdx >= 0 && lastClickIdx < clicksSeries.length - 1) clicksSeries = clicksSeries.slice(0, lastClickIdx + 1)
   return NextResponse.json({
     connected: true,
     ga4Connected: true,
@@ -122,8 +130,8 @@ export async function GET(req: NextRequest) {
     users: num(s[0]?.value), newUsers: num(s[1]?.value), sessions: num(s[2]?.value), pageViews: num(s[3]?.value),
     today: num(today?.rows?.[0]?.metricValues?.[0]?.value),
     users7d: num(seven?.rows?.[0]?.metricValues?.[0]?.value),
-    usersChart: buildSeries((usersChart?.rows || []).map((row: any) => ({ date: row.dimensionValues[0].value, value: num(row.metricValues[0].value) })), dr.startDate, dr.endDate),
-    clicksChart: buildSeries(clicksChart || [], dr.startDate, dr.endDate),
+    usersChart: usersSeries,
+    clicksChart: clicksSeries,
     topPages: (pages?.rows || []).map((row: any) => ({ path: row.dimensionValues[0].value, views: num(row.metricValues[0].value) })),
     topCountries: (countries?.rows || []).map((row: any) => ({ name: row.dimensionValues[0].value, users: num(row.metricValues[0].value) })),
     searchKeywords: searchKeywords || [],
