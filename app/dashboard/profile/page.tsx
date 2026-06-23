@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import { Camera, Loader2 } from 'lucide-react'
+import ConfirmDialog from '@/components/admin/ConfirmDialog'
 
 // Crop to a square and convert any image to a 256px WebP avatar.
 async function toAvatarWebp(file: File): Promise<Blob> {
@@ -27,6 +28,7 @@ export default function ProfilePage() {
   const [uploading, setUploading] = useState(false)
   const [msg, setMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
   const [deleting, setDeleting] = useState(false)
+  const [confirmDel, setConfirmDel] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
@@ -68,8 +70,8 @@ export default function ProfilePage() {
     setUploading(false)
   }
 
-  async function deleteAccount() {
-    if (!confirm('Are you sure? This cannot be undone.')) return
+  async function doDeleteAccount() {
+    setConfirmDel(false)
     setDeleting(true)
     await supabase.from('profiles').delete().eq('id', user.id)
     await supabase.auth.signOut()
@@ -120,10 +122,11 @@ export default function ProfilePage() {
       <div className="rounded-2xl p-6" style={{ background: 'var(--bg-card)', border: '1px solid rgba(239,68,68,0.3)' }}>
         <h2 className="font-fraunces text-lg font-bold mb-2" style={{ color: '#ef4444' }}>Danger Zone</h2>
         <p className="text-sm mb-4" style={{ color: 'var(--text-muted)' }}>Permanently delete your account and all data. This cannot be undone.</p>
-        <button onClick={deleteAccount} disabled={deleting} className="px-5 py-2.5 rounded-xl text-sm font-semibold text-white" style={{ background: '#ef4444' }}>
+        <button onClick={() => setConfirmDel(true)} disabled={deleting} className="px-5 py-2.5 rounded-xl text-sm font-semibold text-white" style={{ background: '#ef4444' }}>
           {deleting ? 'Deleting...' : 'Delete Account'}
         </button>
       </div>
+      <ConfirmDialog open={confirmDel} title="Delete your account?" message="This permanently deletes your profile and signs you out. This cannot be undone." confirmLabel="Delete account" onConfirm={doDeleteAccount} onCancel={() => setConfirmDel(false)} />
     </div>
   )
 }

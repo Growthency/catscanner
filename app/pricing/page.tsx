@@ -49,6 +49,7 @@ export default function PricingPage() {
   const router = useRouter()
   const [loading, setLoading] = useState<string | null>(null)
   const [openFaq, setOpenFaq] = useState<number | null>(null)
+  const [payErr, setPayErr] = useState<string | null>(null)
 
   async function handleBuy(packId: string) {
     setLoading(packId)
@@ -62,7 +63,7 @@ export default function PricingPage() {
       const data = await res.json()
       if (data.url) window.location.href = data.url
     } catch {
-      alert('Failed to start checkout. Please try again.')
+      setPayErr('Could not start checkout. Please try again or contact support@catscanner.org.')
     } finally {
       setLoading(null)
     }
@@ -70,6 +71,12 @@ export default function PricingPage() {
 
   return (
     <div style={{background:'var(--bg-primary)', minHeight:'100vh', paddingTop:'80px'}}>
+      {payErr && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium" style={{ background: '#fef2f2', border: '1px solid #fecaca', color: '#b91c1c', boxShadow: '0 12px 34px rgba(0,0,0,0.15)' }}>
+          {payErr}
+          <button onClick={() => setPayErr(null)} aria-label="Dismiss" style={{ color: '#b91c1c' }}>✕</button>
+        </div>
+      )}
       {/* Hero */}
       <section className="py-16 text-center px-4">
         <h1 className="font-fraunces text-5xl font-black mb-4" style={{color:'var(--text-primary)'}}>

@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import { ADMIN as C } from '@/lib/admin-theme'
 import { Code2, Plus, Trash2, Loader2, Power } from 'lucide-react'
+import ConfirmDialog from '@/components/admin/ConfirmDialog'
 
 type Script = { id: string; name: string; code: string; enabled: boolean }
 
@@ -13,6 +14,7 @@ export default function HeaderScriptsPage() {
   const [name, setName] = useState('')
   const [code, setCode] = useState('')
   const [saving, setSaving] = useState(false)
+  const [confirmId, setConfirmId] = useState<string | null>(null)
 
   async function authHeader() {
     const { data: { session } } = await supabase.auth.getSession()
@@ -40,8 +42,7 @@ export default function HeaderScriptsPage() {
     setScripts((list) => list.map((x) => x.id === s.id ? { ...x, enabled: !x.enabled } : x))
   }
 
-  async function remove(id: string) {
-    if (!window.confirm('Delete this script?')) return
+  async function doRemove(id: string) {
     await fetch(`/api/admin/header-scripts?id=${id}`, { method: 'DELETE', headers: await authHeader() })
     setScripts((list) => list.filter((x) => x.id !== id))
   }
@@ -93,11 +94,12 @@ export default function HeaderScriptsPage() {
               <button onClick={() => toggle(s)} className="flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full" style={s.enabled ? { background: '#dcfce7', color: '#16a34a' } : { background: '#f1f5f9', color: C.faint }}>
                 <Power size={12} /> {s.enabled ? 'On' : 'Off'}
               </button>
-              <button onClick={() => remove(s.id)} className="p-2 rounded-lg" style={{ color: '#ef4444' }}><Trash2 size={15} /></button>
+              <button onClick={() => setConfirmId(s.id)} className="p-2 rounded-lg" style={{ color: '#ef4444' }}><Trash2 size={15} /></button>
             </div>
           ))}
         </div>
       )}
+      <ConfirmDialog open={!!confirmId} title="Delete script?" message="This removes the header script from every page. This cannot be undone." confirmLabel="Delete script" onConfirm={() => { if (confirmId) doRemove(confirmId); setConfirmId(null) }} onCancel={() => setConfirmId(null)} />
     </div>
   )
 }

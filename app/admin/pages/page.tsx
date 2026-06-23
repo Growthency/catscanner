@@ -5,6 +5,7 @@ import { supabase } from '@/lib/supabase'
 import { ADMIN as C } from '@/lib/admin-theme'
 import type { Post } from '@/lib/posts'
 import { Plus, FileText, Pencil, Trash2, ExternalLink, Loader2, Search, Link2 } from 'lucide-react'
+import ConfirmDialog from '@/components/admin/ConfirmDialog'
 
 type Tab = 'all' | 'published' | 'draft' | 'scheduled'
 
@@ -20,6 +21,7 @@ export default function AdminPages() {
   const [error, setError] = useState<string | null>(null)
   const [tab, setTab] = useState<Tab>('all')
   const [search, setSearch] = useState('')
+  const [confirmId, setConfirmId] = useState<string | null>(null)
 
   async function authHeader() {
     const { data: { session } } = await supabase.auth.getSession()
@@ -38,8 +40,7 @@ export default function AdminPages() {
   }
   useEffect(() => { load() }, [])
 
-  async function remove(id: string) {
-    if (!window.confirm('Delete this post permanently?')) return
+  async function doRemove(id: string) {
     await fetch(`/api/admin/posts/${id}`, { method: 'DELETE', headers: await authHeader() })
     setPosts((p) => p.filter((x) => x.id !== id))
   }
@@ -142,13 +143,14 @@ export default function AdminPages() {
                 <div className="col-span-2 md:col-span-1 flex items-center justify-end gap-0.5">
                   {st === 'published' && <a href={`/${p.slug}`} target="_blank" rel="noreferrer" title="View" className="p-1.5 rounded-lg hover:bg-black/5" style={{ color: C.muted }}><ExternalLink size={15} /></a>}
                   <Link href={`/admin/pages/edit?id=${p.id}`} title="Edit" className="p-1.5 rounded-lg hover:bg-black/5" style={{ color: C.muted }}><Pencil size={15} /></Link>
-                  <button onClick={() => remove(p.id)} title="Delete" className="p-1.5 rounded-lg hover:bg-black/5" style={{ color: '#ef4444' }}><Trash2 size={15} /></button>
+                  <button onClick={() => setConfirmId(p.id)} title="Delete" className="p-1.5 rounded-lg hover:bg-black/5" style={{ color: '#ef4444' }}><Trash2 size={15} /></button>
                 </div>
               </div>
             )
           })}
         </div>
       )}
+      <ConfirmDialog open={!!confirmId} title="Delete post?" message="This permanently deletes the post and can’t be undone." confirmLabel="Delete post" onConfirm={() => { if (confirmId) doRemove(confirmId); setConfirmId(null) }} onCancel={() => setConfirmId(null)} />
     </div>
   )
 }
