@@ -1,10 +1,10 @@
 'use client'
-import { useRef, useEffect, useState } from 'react'
+import { useRef, useEffect, useState, useCallback } from 'react'
 import { ADMIN as C } from '@/lib/admin-theme'
 import ImageUpload from './ImageUpload'
 import {
-  Bold, Italic, Underline, Strikethrough, List, ListOrdered,
-  Link2, Heading2, Heading3, Heading4, Pilcrow, Code, Image as ImageIcon, Quote, Upload, X, Check,
+  Bold, Italic, Underline, Strikethrough, List, ListOrdered, Link2, Heading2, Heading3,
+  Heading4, Pilcrow, Code, Image as ImageIcon, Quote, Upload, X, Check, Trash2, Pencil, ExternalLink,
 } from 'lucide-react'
 
 const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
@@ -19,17 +19,23 @@ function buildFigure(url: string, alt: string, caption: string): string {
 }
 
 export default function RichTextEditor({ value, onChange }: { value: string; onChange: (html: string) => void }) {
+  const wrapRef = useRef<HTMLDivElement>(null)
   const ref = useRef<HTMLDivElement>(null)
   const htmlFileRef = useRef<HTMLInputElement>(null)
   const savedRange = useRef<Range | null>(null)
+  const editLinkEl = useRef<HTMLAnchorElement | null>(null)
+  const selEl = useRef<HTMLElement | null>(null)
   const [showHtml, setShowHtml] = useState(false)
   const [panel, setPanel] = useState<null | 'link' | 'image'>(null)
   const [linkUrl, setLinkUrl] = useState('')
   const [imgUrl, setImgUrl] = useState('')
   const [imgAlt, setImgAlt] = useState('')
   const [imgCaption, setImgCaption] = useState('')
+  // Floating control shown when an existing image / link is clicked.
+  const [sel, setSel] = useState<{ type: 'img' | 'link'; top: number; left: number; width: number } | null>(null)
+  const [selAlt, setSelAlt] = useState('')
+  const [selHref, setSelHref] = useState('')
 
-  // Seed the editor with the loaded HTML (on mount and when toggling back from HTML view).
   useEffect(() => {
     if (!showHtml && ref.current && ref.current.innerHTML !== value) ref.current.innerHTML = value || ''
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -43,30 +49,67 @@ export default function RichTextEditor({ value, onChange }: { value: string; onC
     ref.current?.focus()
   }
 
-  // Save / restore the caret so inserting a link or image lands where the cursor
-  // was (focusing a panel input would otherwise lose the selection → jump to top).
   function saveSel() {
-    const sel = window.getSelection()
-    savedRange.current = sel && sel.rangeCount && ref.current?.contains(sel.anchorNode) ? sel.getRangeAt(0).cloneRange() : null
+    const s = window.getSelection()
+    savedRange.current = s && s.rangeCount && ref.current?.contains(s.anchorNode) ? s.getRangeAt(0).cloneRange() : null
   }
   function restoreSel() {
     ref.current?.focus()
-    const sel = window.getSelection()
-    if (sel && savedRange.current) { sel.removeAllRanges(); sel.addRange(savedRange.current) }
+    const s = window.getSelection()
+    if (s && savedRange.current) { s.removeAllRanges(); s.addRange(savedRange.current) }
   }
 
-  function openLink() { saveSel(); setLinkUrl(''); setPanel('link') }
+  // ── Floating control for a clicked image / link ──
+  const computePos = useCallback((el: HTMLElement) => {
+    const wrap = wrapRef.current, body = ref.current
+    if (!wrap || !body) return null
+    const wr = wrap.getBoundingClientRect(), br = body.getBoundingClientRect(), r = el.getBoundingClientRect()
+    if (r.bottom < br.top + 6 || r.top > br.bottom - 6) return null // scrolled out of view
+    return { top: Math.min(r.bottom, br.bottom) - wr.top, left: Math.max(8, r.left - wr.left), width: r.width }
+  }, [])
+
+  function onBodyClick(e: React.MouseEvent) {
+    const t = e.target as HTMLElement
+    if (t.tagName === 'IMG') {
+      selEl.current = t; setSelAlt((t as HTMLImageElement).alt || '')
+      const p = computePos(t); setSel(p ? { type: 'img', ...p } : null)
+      return
+    }
+    const a = t.closest?.('a') as HTMLAnchorElement | null
+    if (a && ref.current?.contains(a)) {
+      selEl.current = a; setSelHref(a.getAttribute('href') || '')
+      const p = computePos(a); setSel(p ? { type: 'link', ...p } : null)
+      return
+    }
+    setSel(null); selEl.current = null
+  }
+
+  const reposition = useCallback(() => {
+    if (!selEl.current) return
+    const p = computePos(selEl.current)
+    if (!p) { selEl.current = null; setSel(null); return }
+    setSel((s) => (s ? { ...s, ...p } : null))
+  }, [computePos])
+
+  function setImageAlt(v: string) { setSelAlt(v); if (selEl.current) { (selEl.current as HTMLImageElement).alt = v; sync() } }
+  function deleteImage() { const el = selEl.current; (el?.closest('figure') || el)?.remove(); setSel(null); selEl.current = null; sync(); ref.current?.focus() }
+  function openExternal() { const h = selEl.current?.getAttribute('href'); if (h) window.open(h, '_blank', 'noopener') }
+  function removeLink() { const a = selEl.current; if (a) a.replaceWith(document.createTextNode(a.textContent || '')); setSel(null); selEl.current = null; sync(); ref.current?.focus() }
+  function editLink() { editLinkEl.current = selEl.current as HTMLAnchorElement; setLinkUrl(selEl.current?.getAttribute('href') || ''); setSel(null); setPanel('link') }
+
+  function openLink() { editLinkEl.current = null; setSel(null); saveSel(); setLinkUrl(''); setPanel('link') }
   function applyLink() {
     const url = linkUrl.trim()
-    if (!url) { setPanel(null); return }
+    if (!url) { setPanel(null); editLinkEl.current = null; return }
+    if (editLinkEl.current) { editLinkEl.current.setAttribute('href', url); editLinkEl.current = null; setPanel(null); setLinkUrl(''); sync(); return }
     restoreSel()
-    const sel = window.getSelection()
-    if (sel && sel.rangeCount && !sel.getRangeAt(0).collapsed) document.execCommand('createLink', false, url)
+    const s = window.getSelection()
+    if (s && s.rangeCount && !s.getRangeAt(0).collapsed) document.execCommand('createLink', false, url)
     else document.execCommand('insertHTML', false, `<a href="${esc(url)}">${esc(url)}</a>`)
     setPanel(null); setLinkUrl(''); sync()
   }
 
-  function openImage() { saveSel(); setImgUrl(''); setImgAlt(''); setImgCaption(''); setPanel('image') }
+  function openImage() { setSel(null); saveSel(); setImgUrl(''); setImgAlt(''); setImgCaption(''); setPanel('image') }
   function applyImage() {
     const url = imgUrl.trim()
     if (!url) return
@@ -75,7 +118,6 @@ export default function RichTextEditor({ value, onChange }: { value: string; onC
     setPanel(null); sync()
   }
 
-  // Load a raw .html file straight into the editor content.
   function uploadHtml(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
     if (!file) return
@@ -95,9 +137,10 @@ export default function RichTextEditor({ value, onChange }: { value: string; onC
   }
   const Divider = () => <span style={{ width: 1, height: 18, background: C.border, margin: '0 3px' }} />
   const inp = { background: C.card, border: `1px solid ${C.border}`, color: C.text }
+  const floatStyle: React.CSSProperties = { position: 'absolute', zIndex: 30, background: C.card, border: `1px solid ${C.border}`, boxShadow: '0 8px 24px rgba(0,0,0,0.14)', borderRadius: 10 }
 
   return (
-    <div className="rounded-xl" style={{ border: `1px solid ${C.border}` }}>
+    <div ref={wrapRef} className="rounded-xl relative" style={{ border: `1px solid ${C.border}` }}>
       {/* Toolbar — sticks to the top while you scroll the content */}
       <div className="flex flex-wrap items-center gap-0.5 px-2 py-1.5 sticky top-0 z-20 rounded-t-xl" style={{ background: C.bg, borderBottom: `1px solid ${C.border}` }}>
         <Btn title="Heading 2" onClick={() => exec('formatBlock', 'H2')}><Heading2 size={16} /></Btn>
@@ -133,11 +176,11 @@ export default function RichTextEditor({ value, onChange }: { value: string; onC
       {panel === 'link' && (
         <div className="flex flex-wrap items-center gap-2 px-3 py-2.5" style={{ background: C.card, borderBottom: `1px solid ${C.border}` }}>
           <input autoFocus value={linkUrl} onChange={(e) => setLinkUrl(e.target.value)}
-            onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); applyLink() } if (e.key === 'Escape') setPanel(null) }}
+            onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); applyLink() } if (e.key === 'Escape') { setPanel(null); editLinkEl.current = null } }}
             placeholder="https://example.com or /your-slug"
             className="flex-1 min-w-[200px] px-3 py-2 rounded-lg outline-none text-sm" style={inp} />
-          <button type="button" onClick={applyLink} className="flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-medium text-white" style={{ background: C.accent }}><Check size={14} /> Insert link</button>
-          <button type="button" onClick={() => setPanel(null)} className="flex items-center gap-1 px-3 py-2 rounded-lg text-sm" style={{ border: `1px solid ${C.border}`, color: C.muted }}><X size={14} /> Cancel</button>
+          <button type="button" onClick={applyLink} className="flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-medium text-white" style={{ background: C.accent }}><Check size={14} /> {editLinkEl.current ? 'Update link' : 'Insert link'}</button>
+          <button type="button" onClick={() => { setPanel(null); editLinkEl.current = null }} className="flex items-center gap-1 px-3 py-2 rounded-lg text-sm" style={{ border: `1px solid ${C.border}`, color: C.muted }}><X size={14} /> Cancel</button>
         </div>
       )}
 
@@ -168,9 +211,32 @@ export default function RichTextEditor({ value, onChange }: { value: string; onC
           className="w-full p-4 outline-none font-mono text-xs leading-relaxed rounded-b-xl"
           style={{ minHeight: 360, maxHeight: 460, background: C.card, color: C.text, resize: 'vertical', display: 'block' }} />
       ) : (
-        <div ref={ref} contentEditable suppressContentEditableWarning onInput={sync} onMouseUp={sync} onBlur={sync}
+        <div ref={ref} contentEditable suppressContentEditableWarning
+          onInput={() => { sync(); reposition() }} onMouseUp={sync} onBlur={sync} onClick={onBodyClick} onScroll={reposition}
           className="post-body w-full p-4 outline-none rounded-b-xl" data-placeholder="Write your article here…"
           style={{ minHeight: 360, maxHeight: 460, overflowY: 'auto', background: C.card, color: C.text }} />
+      )}
+
+      {/* Floating control — image (ALT + delete) */}
+      {sel?.type === 'img' && (
+        <div style={{ ...floatStyle, top: sel.top + 6, left: sel.left, width: Math.max(260, Math.min(sel.width, 560)) }} className="flex items-center gap-2 px-2 py-1.5">
+          <span className="text-[10px] font-bold px-1.5 py-0.5 rounded" style={{ background: C.accentBg, color: C.accent }}>ALT</span>
+          <input value={selAlt} onChange={(e) => setImageAlt(e.target.value)} placeholder="Describe this image (alt text)"
+            className="flex-1 min-w-0 px-2 py-1.5 rounded-md outline-none text-sm" style={inp} />
+          <button type="button" onClick={deleteImage} title="Delete image" className="w-8 h-8 flex items-center justify-center rounded-md shrink-0" style={{ color: '#ef4444' }}><Trash2 size={16} /></button>
+          <button type="button" onClick={() => setSel(null)} title="Close" className="w-8 h-8 flex items-center justify-center rounded-md shrink-0" style={{ color: C.muted }}><X size={16} /></button>
+        </div>
+      )}
+
+      {/* Floating control — link (url + edit + open + remove) */}
+      {sel?.type === 'link' && (
+        <div style={{ ...floatStyle, top: sel.top + 6, left: sel.left, maxWidth: 380 }} className="flex items-center gap-1 px-2 py-1.5">
+          <span className="text-sm truncate max-w-[180px]" style={{ color: C.accent }} title={selHref}>{selHref || '(no URL)'}</span>
+          <Divider />
+          <button type="button" onClick={editLink} title="Change link" className="w-8 h-8 flex items-center justify-center rounded-md" style={{ color: C.muted }}><Pencil size={15} /></button>
+          <button type="button" onClick={openExternal} title="Open in new tab" className="w-8 h-8 flex items-center justify-center rounded-md" style={{ color: C.muted }}><ExternalLink size={15} /></button>
+          <button type="button" onClick={removeLink} title="Remove link" className="w-8 h-8 flex items-center justify-center rounded-md" style={{ color: '#ef4444' }}><X size={15} /></button>
+        </div>
       )}
     </div>
   )
