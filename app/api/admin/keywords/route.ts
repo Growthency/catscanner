@@ -44,6 +44,14 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ keyword: data })
   }
 
+  // Manually set / clear the search volume for a keyword.
+  if (body.volumeId) {
+    const n = Number(body.volume)
+    const volume = body.volume == null || body.volume === '' || !Number.isFinite(n) ? null : Math.round(n)
+    const { data } = await supabase.from('tracked_keywords').update({ volume }).eq('id', body.volumeId).select().single()
+    return NextResponse.json({ keyword: data })
+  }
+
   // Add a new keyword.
   const keyword = (body.keyword || '').trim()
   if (!keyword) return NextResponse.json({ error: 'Keyword required' }, { status: 400 })

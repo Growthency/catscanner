@@ -104,6 +104,21 @@ export default function SeoHealth() {
   const totalChecks = all.reduce((s, r) => s + r.total, 0)
   const score = pct(totalPassed, totalChecks)
   const issues = all.flatMap((r) => r.issues)
+  const issueGroups = (() => {
+    const map = new Map<string, { level: string; title: string; desc: string; pages: number }>()
+    for (const r of all) {
+      for (const iss of r.issues) {
+        const parts = iss.message.split(' — ')
+        const title = parts[0]
+        const desc = parts.slice(1).join(' — ')
+        const key = title.replace(/\s*\([^)]*\)/g, '').trim() + '|' + iss.level
+        const g = map.get(key)
+        if (g) g.pages++
+        else map.set(key, { level: iss.level, title, desc, pages: 1 })
+      }
+    }
+    return Array.from(map.values()).sort((a, b) => b.pages - a.pages)
+  })()
   const critical = issues.filter((i) => i.level === 'critical').length
   const warnings = issues.filter((i) => i.level === 'warning').length
   const infos = issues.filter((i) => i.level === 'info').length
@@ -272,6 +287,29 @@ export default function SeoHealth() {
                     </div>
                   )
                 })}
+              </div>
+
+              {/* Top Issues */}
+              <h3 className="text-sm font-semibold mt-7 mb-3" style={{ color: C.text }}>Top Issues</h3>
+              <div className="rounded-2xl overflow-hidden" style={card}>
+                {issueGroups.length === 0 ? (
+                  <p className="px-5 py-8 text-center text-sm" style={{ color: C.faint }}>No issues found across your pages — great job! 🎉</p>
+                ) : issueGroups.slice(0, 20).map((g, i) => (
+                  <div key={i} className="flex items-center gap-4 px-5 py-4" style={{ borderTop: i === 0 ? 'none' : `1px solid ${C.border}` }}>
+                    {g.level === 'critical' ? <XCircle size={18} style={{ color: '#ef4444' }} className="shrink-0" /> : g.level === 'warning' ? <AlertTriangle size={18} style={{ color: '#f59e0b' }} className="shrink-0" /> : <Info size={18} style={{ color: '#3b82f6' }} className="shrink-0" />}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="text-sm font-semibold" style={{ color: C.text }}>{g.title}</span>
+                        <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded uppercase tracking-wide" style={{ background: g.level === 'critical' ? '#fef2f2' : g.level === 'warning' ? '#fffbeb' : '#eff6ff', color: g.level === 'critical' ? '#dc2626' : g.level === 'warning' ? '#b45309' : '#2563eb' }}>{g.level}</span>
+                      </div>
+                      {g.desc && <p className="text-xs mt-0.5" style={{ color: C.muted }}>{g.desc}</p>}
+                    </div>
+                    <div className="text-right shrink-0">
+                      <p className="text-xl font-bold leading-none" style={{ color: C.text }}>{g.pages}</p>
+                      <p className="text-[11px] mt-0.5" style={{ color: C.faint }}>pages</p>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           )}

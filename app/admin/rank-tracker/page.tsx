@@ -39,6 +39,8 @@ export default function RankTracker() {
   const [adding, setAdding] = useState(false)
   const [busyId, setBusyId] = useState<string | null>(null)
   const [checkingAll, setCheckingAll] = useState(false)
+  const [editVol, setEditVol] = useState<string | null>(null)
+  const [volVal, setVolVal] = useState('')
   const [queries, setQueries] = useState<Query[]>([])
   const [gscConnected, setGscConnected] = useState(false)
   const [gscError, setGscError] = useState<string | null>(null)
@@ -85,6 +87,13 @@ export default function RankTracker() {
     setBusyId(id)
     await fetch(`/api/admin/keywords?id=${id}`, { method: 'DELETE', headers: await authHeader() })
     setKeywords((k) => k.filter((x) => x.id !== id)); setBusyId(null)
+  }
+  async function saveVolume(id: string) {
+    const v = volVal.trim()
+    setEditVol(null)
+    const volume = v === '' ? null : Number(v)
+    setKeywords((list) => list.map((k) => (k.id === id ? { ...k, volume } : k)))
+    await fetch('/api/admin/keywords', { method: 'POST', headers: await authHeader(), body: JSON.stringify({ volumeId: id, volume }) })
   }
 
   const withPos = keywords.filter((k) => k.position != null) as (Keyword & { position: number })[]
@@ -166,7 +175,19 @@ export default function RankTracker() {
               <div key={k.id} className="grid grid-cols-12 gap-2 px-5 py-3 items-center text-sm" style={{ borderTop: `1px solid ${C.border}` }}>
                 <span className="col-span-1 font-semibold" style={{ color: C.faint }}>{i + 1}</span>
                 <span className="col-span-4 font-medium truncate" style={{ color: C.text }} title={k.keyword}>{k.keyword}</span>
-                <span className="col-span-1 text-right" style={{ color: C.muted }}>{k.volume != null ? (k.volume >= 1000 ? `${(k.volume / 1000).toFixed(1)}K` : k.volume) : '—'}</span>
+                <span className="col-span-1 text-right">
+                  {editVol === k.id ? (
+                    <input autoFocus value={volVal} onChange={(e) => setVolVal(e.target.value)} onBlur={() => saveVolume(k.id)}
+                      onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); saveVolume(k.id) } if (e.key === 'Escape') setEditVol(null) }}
+                      inputMode="numeric" placeholder="18100"
+                      className="w-20 px-1.5 py-0.5 rounded text-sm text-right outline-none" style={{ border: `1px solid ${C.accent}`, background: C.card, color: C.text }} />
+                  ) : (
+                    <button type="button" onClick={() => { setEditVol(k.id); setVolVal(k.volume != null ? String(k.volume) : '') }} title="Click to set search volume"
+                      className="text-sm hover:underline" style={{ color: k.volume != null ? C.muted : C.faint }}>
+                      {k.volume != null ? (k.volume >= 1000 ? `${(k.volume / 1000).toFixed(1)}K` : k.volume) : 'Set'}
+                    </button>
+                  )}
+                </span>
                 <span className="col-span-2 flex justify-center">
                   <span className="text-sm font-bold px-2.5 py-1 rounded-lg" style={{ background: t.bg, color: t.col }}>{t.label}</span>
                 </span>
