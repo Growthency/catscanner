@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import { ADMIN as C } from '@/lib/admin-theme'
 import { SEO_CATEGORIES, type PageResult } from '@/lib/seo-checks'
@@ -37,6 +37,7 @@ export default function SeoHealth() {
   const [tab, setTab] = useState<'overview' | 'pages' | 'global'>('overview')
   const [lastScan, setLastScan] = useState('')
   const [error, setError] = useState<string | null>(null)
+  const stopRef = useRef(false)
 
   useEffect(() => {
     fetch('/sitemap.xml')
@@ -58,13 +59,26 @@ export default function SeoHealth() {
   const remaining = pages.filter((p) => !results[p])
   const all = Object.values(results)
 
+  function exportCsv() {
+    const rows = [['URL', 'Score', 'Issues', 'Critical', 'Warnings', 'Info']]
+    for (const r of all) {
+      const lv = (l: string) => r.issues.filter((i) => i.level === l).length
+      rows.push([r.url, String(r.score), String(r.issues.length), String(lv('critical')), String(lv('warning')), String(lv('info'))])
+    }
+    const csv = rows.map((row) => row.map((v) => `"${v.replace(/"/g, '""')}"`).join(',')).join('\n')
+    const a = document.createElement('a')
+    a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }))
+    a.download = 'seo-health.csv'; a.click(); URL.revokeObjectURL(a.href)
+  }
+
   async function scan(urls: string[]) {
     if (!urls.length || scanning) return
-    setScanning(true); setError(null)
+    setScanning(true); setError(null); stopRef.current = false
     const { data: { session } } = await supabase.auth.getSession()
     const headers = { Authorization: `Bearer ${session?.access_token}`, 'Content-Type': 'application/json' }
     const acc: Record<string, PageResult> = { ...results }
     for (let i = 0; i < urls.length; i += 8) {
+      if (stopRef.current) break
       const chunk = urls.slice(i, i + 8)
       try {
         const res = await fetch('/api/admin/seo-scan', { method: 'POST', headers, body: JSON.stringify({ urls: chunk }) })
@@ -126,14 +140,29 @@ export default function SeoHealth() {
         <div className="flex-1 min-w-[120px] h-2 rounded-full overflow-hidden" style={{ background: C.bg }}>
           <div className="h-full rounded-full transition-all" style={{ width: `${progress}%`, background: C.accent }} />
         </div>
-        <button onClick={() => scan(remaining.slice(0, 8))} disabled={scanning || !remaining.length}
-          className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold text-white disabled:opacity-50" style={{ background: C.accent }}>
-          {scanning ? <Loader2 size={15} className="animate-spin" /> : <Play size={15} />} Scan Next 8
-        </button>
-        <button onClick={() => scan(remaining)} disabled={scanning || !remaining.length}
-          className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold disabled:opacity-50" style={{ background: C.card, border: `1px solid ${C.border}`, color: C.text }}>
-          <Zap size={15} /> Scan All ({remaining.length})
-        </button>
+        {scanning ? (
+          <button onClick={() => { stopRef.current = true }} className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold" style={{ background: '#fef2f2', border: '1px solid #fecaca', color: '#dc2626' }}>
+            <Loader2 size={15} className="animate-spin" /> Stop
+          </button>
+        ) : (
+          <>
+            {remaining.length > 0 && (
+              <button onClick={() => scan(remaining.slice(0, 8))}
+                className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold" style={{ background: C.card, border: `1px solid ${C.border}`, color: C.text }}>
+                <Play size={15} /> Scan next 8
+              </button>
+            )}
+            <button onClick={() => scan(pages)} disabled={!pages.length}
+              className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold text-white disabled:opacity-50" style={{ background: C.accent }}>
+              <Zap size={15} /> {all.length ? 'Re-scan all' : `Scan all (${pages.length})`}
+            </button>
+            {all.length > 0 && (
+              <button onClick={exportCsv} className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium" style={{ background: C.card, border: `1px solid ${C.border}`, color: C.muted }}>
+                Export CSV
+              </button>
+            )}
+          </>
+        )}
       </div>
 
       {error && <div className="rounded-xl px-4 py-3 text-sm" style={{ background: '#fef2f2', border: '1px solid #fecaca', color: '#b91c1c' }}>{error}</div>}

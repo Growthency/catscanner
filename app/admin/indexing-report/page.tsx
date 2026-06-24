@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import { ADMIN as C } from '@/lib/admin-theme'
 import {
-  Globe, RefreshCw, Loader2, Zap, Radio, Rss, Send, CheckCircle2, XCircle, Search, ExternalLink, Sparkles,
+  Globe, RefreshCw, Loader2, Zap, Radio, Rss, Send, CheckCircle2, XCircle, Search, ExternalLink, Sparkles, Copy,
 } from 'lucide-react'
 
 const SITE = 'https://catscanner.org/'
@@ -33,6 +33,7 @@ export default function IndexingReport() {
   const [search, setSearch] = useState('')
   const [lastScan, setLastScan] = useState('')
   const [busy, setBusy] = useState<string | null>(null)
+  const [copied, setCopied] = useState<string | null>(null)
 
   useEffect(() => {
     fetch('/sitemap.xml').then((r) => r.text()).then((xml) => {
@@ -93,6 +94,15 @@ export default function IndexingReport() {
     return Object.entries(counts).sort((a, b) => b[1] - a[1])
   }, [pages, status, connected])
 
+  const urlsByState = useMemo(() => {
+    const m: Record<string, string[]> = {}
+    for (const p of pages) { const s = status[p]?.coverageState || 'Not scanned'; (m[s] ||= []).push(p) }
+    return m
+  }, [pages, status])
+  function copyUrls(urls: string[], label: string) {
+    if (!urls.length) return
+    navigator.clipboard?.writeText(urls.join('\n')).then(() => { setCopied(label); setTimeout(() => setCopied(null), 1800) }).catch(() => {})
+  }
   const filtered = (list: string[]) => list.filter((p) => p.toLowerCase().includes(search.toLowerCase()))
   const path = (u: string) => { try { return new URL(u).pathname } catch { return u } }
   const inspectUrl = (u: string) => `https://search.google.com/search-console/inspect?resource_id=${encodeURIComponent(SITE)}&id=${encodeURIComponent(u)}`
@@ -123,6 +133,11 @@ export default function IndexingReport() {
 
   return (
     <div className="max-w-7xl mx-auto space-y-5">
+      {copied && (
+        <div className="fixed top-6 right-6 z-[100] px-4 py-2.5 rounded-xl text-sm font-medium" style={{ background: '#dcfce7', border: '1px solid #86efac', color: '#16a34a', boxShadow: '0 10px 30px rgba(0,0,0,0.12)' }}>
+          Copied {(urlsByState[copied]?.length ?? (copied === 'indexed-list' ? indexed.length : copied === 'notindexed-list' ? notIndexed.length : 0))} URL(s) to clipboard
+        </div>
+      )}
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-3">
@@ -205,13 +220,17 @@ export default function IndexingReport() {
           </div>
         </div>
         <div className="rounded-2xl p-6" style={card}>
-          <h3 className="text-sm font-semibold mb-4" style={{ color: C.text }}>Coverage Breakdown</h3>
+          <h3 className="text-sm font-semibold mb-1" style={{ color: C.text }}>Coverage Breakdown</h3>
+          <p className="flex items-center gap-1 text-xs mb-4" style={{ color: C.faint }}><Copy size={11} /> Click any row to copy its URLs.</p>
           <div className="space-y-3">
             {coverage.map(([state, count]) => (
-              <div key={state}>
-                <div className="flex justify-between text-sm mb-1"><span style={{ color: C.muted }}>{state}</span><span className="font-semibold" style={{ color: C.text }}>{count} ({Math.round((count / pages.length) * 100)}%)</span></div>
+              <button key={state} type="button" onClick={() => copyUrls(urlsByState[state] || [], state)} className="w-full text-left rounded-lg px-1.5 py-1 -mx-1.5 hover:bg-black/5 transition-colors">
+                <div className="flex justify-between text-sm mb-1">
+                  <span style={{ color: C.muted }}>{state}</span>
+                  <span className="font-semibold" style={{ color: copied === state ? '#16a34a' : C.text }}>{copied === state ? 'Copied!' : `${count} (${Math.round((count / pages.length) * 100)}%)`}</span>
+                </div>
                 <div className="w-full h-1.5 rounded-full overflow-hidden" style={{ background: C.bg }}><div className="h-full rounded-full" style={{ width: `${(count / pages.length) * 100}%`, background: C.accent }} /></div>
-              </div>
+              </button>
             ))}
           </div>
         </div>
@@ -231,11 +250,17 @@ export default function IndexingReport() {
       {/* Page lists */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
         <div className="rounded-2xl overflow-hidden" style={card}>
-          <p className="flex items-center gap-2 px-4 py-3 text-sm font-semibold" style={{ color: C.text }}><CheckCircle2 size={15} style={{ color: '#16a34a' }} /> Indexed Pages ({indexed.length})</p>
+          <div className="flex items-center justify-between px-4 py-3">
+            <p className="flex items-center gap-2 text-sm font-semibold" style={{ color: C.text }}><CheckCircle2 size={15} style={{ color: '#16a34a' }} /> Indexed Pages ({indexed.length})</p>
+            {indexed.length > 0 && <button onClick={() => copyUrls(indexed, 'indexed-list')} title="Copy all URLs" className="flex items-center gap-1 text-xs px-2 py-1 rounded" style={{ background: C.bg, color: copied === 'indexed-list' ? '#16a34a' : C.muted }}><Copy size={12} /> {copied === 'indexed-list' ? 'Copied!' : 'Copy'}</button>}
+          </div>
           {filtered(indexed).length === 0 ? <p className="px-4 py-8 text-center text-sm" style={{ color: C.faint }}>No indexed pages match.</p> : filtered(indexed).map((u) => <PageRow key={u} url={u} />)}
         </div>
         <div className="rounded-2xl overflow-hidden" style={card}>
-          <p className="flex items-center gap-2 px-4 py-3 text-sm font-semibold" style={{ color: C.text }}><XCircle size={15} style={{ color: '#ef4444' }} /> Not Indexed Pages ({notIndexed.length})</p>
+          <div className="flex items-center justify-between px-4 py-3">
+            <p className="flex items-center gap-2 text-sm font-semibold" style={{ color: C.text }}><XCircle size={15} style={{ color: '#ef4444' }} /> Not Indexed Pages ({notIndexed.length})</p>
+            {notIndexed.length > 0 && <button onClick={() => copyUrls(notIndexed, 'notindexed-list')} title="Copy all URLs" className="flex items-center gap-1 text-xs px-2 py-1 rounded" style={{ background: C.bg, color: copied === 'notindexed-list' ? '#16a34a' : C.muted }}><Copy size={12} /> {copied === 'notindexed-list' ? 'Copied!' : 'Copy'}</button>}
+          </div>
           {filtered(notIndexed).length === 0 ? <p className="px-4 py-8 text-center text-sm" style={{ color: C.faint }}>No pages match.</p> : filtered(notIndexed).map((u) => <PageRow key={u} url={u} />)}
         </div>
       </div>
