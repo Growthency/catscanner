@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useTheme } from '@/components/providers/ThemeProvider'
-import { Sun, Moon, Menu, X, LayoutDashboard, User, Crown, LogOut, ScanLine } from 'lucide-react'
+import { Sun, Moon, Menu, X, LayoutDashboard, User, Crown, LogOut } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 
 export default function Navbar() {
@@ -42,6 +42,7 @@ export default function Navbar() {
 
   const navLinks = [
     { href: '/', label: 'Home' },
+    { href: '/#scanner', label: 'Identifier' },
     { href: '/pricing', label: 'Pricing' },
     { href: '/blog', label: 'Blog' },
     { href: '/about', label: 'About' },
@@ -125,13 +126,6 @@ export default function Navbar() {
                 </Link>
               )
             })}
-            <Link
-              href="/#scanner"
-              className="flex items-center gap-1.5 ml-1 px-3.5 py-1.5 rounded-full text-sm font-semibold transition-all hover:opacity-90"
-              style={{ background: 'var(--accent-bg)', color: 'var(--accent)', border: '1px solid var(--accent)' }}
-            >
-              <ScanLine size={15} /> Identifier
-            </Link>
           </div>
 
           {/* Right side */}
@@ -229,7 +223,6 @@ export default function Navbar() {
               </Link>
             )
           })}
-          <Link href="/#scanner" onClick={() => setMobileOpen(false)} className="font-fraunces text-3xl font-bold" style={{ color: 'var(--accent)' }}>Identifier</Link>
           <div className="flex items-center gap-4 mt-4">
             <button onClick={toggle} className="p-2 rounded-full" style={{ color: 'var(--text-muted)', background: 'var(--purple-bg)' }}>
               {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
