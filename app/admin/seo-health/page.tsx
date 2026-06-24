@@ -4,9 +4,11 @@ import { supabase } from '@/lib/supabase'
 import { ADMIN as C } from '@/lib/admin-theme'
 import { SEO_CATEGORIES, type PageResult } from '@/lib/seo-checks'
 import {
-  Play, Zap, Loader2, XCircle, AlertTriangle, Info, CheckCircle2,
+  Play, Zap, Loader2, XCircle, AlertTriangle, Info, CheckCircle2, RefreshCw, Shield, Download,
   FileText, Share2, Twitter, Type, Image as ImageIcon, Braces, Settings, Gauge, Link2,
 } from 'lucide-react'
+
+const BATCH = 8
 
 const CAT_ICON: Record<string, any> = {
   'Meta Tags': FileText, 'Open Graph': Share2, 'Twitter Cards': Twitter, 'Headings': Type,
@@ -71,15 +73,16 @@ export default function SeoHealth() {
     a.download = 'seo-health.csv'; a.click(); URL.revokeObjectURL(a.href)
   }
 
-  async function scan(urls: string[]) {
+  async function scan(urls: string[], fresh = false) {
     if (!urls.length || scanning) return
     setScanning(true); setError(null); stopRef.current = false
+    if (fresh) setResults({})
     const { data: { session } } = await supabase.auth.getSession()
     const headers = { Authorization: `Bearer ${session?.access_token}`, 'Content-Type': 'application/json' }
-    const acc: Record<string, PageResult> = { ...results }
-    for (let i = 0; i < urls.length; i += 8) {
+    const acc: Record<string, PageResult> = fresh ? {} : { ...results }
+    for (let i = 0; i < urls.length; i += BATCH) {
       if (stopRef.current) break
-      const chunk = urls.slice(i, i + 8)
+      const chunk = urls.slice(i, i + BATCH)
       try {
         const res = await fetch('/api/admin/seo-scan', { method: 'POST', headers, body: JSON.stringify({ urls: chunk }) })
         const data = await res.json()
@@ -92,6 +95,10 @@ export default function SeoHealth() {
     setScanning(false)
     fetch('/api/admin/scan-cache', { method: 'POST', headers, body: JSON.stringify({ key: 'seo-health', data: { results: acc } }) }).catch(() => {})
   }
+
+  const rescan = () => scan(pages.slice(0, BATCH), true)
+  const scanNext = () => scan(remaining.slice(0, BATCH))
+  const scanAll = () => scan(remaining)
 
   const totalPassed = all.reduce((s, r) => s + r.passed, 0)
   const totalChecks = all.reduce((s, r) => s + r.total, 0)
@@ -125,56 +132,86 @@ export default function SeoHealth() {
 
   const card = { background: C.card, border: `1px solid ${C.border}` }
   const progress = pages.length ? (all.length / pages.length) * 100 : 0
+  const initialScanning = scanning && all.length === 0
 
   return (
     <div className="max-w-7xl mx-auto space-y-5">
-      <div>
-        <h1 className="text-3xl font-bold" style={{ color: C.text }}>SEO Health</h1>
-        <p className="text-sm mt-1" style={{ color: C.muted }}>Crawl your pages and audit on-page SEO across {SEO_CATEGORIES.length} categories.</p>
-      </div>
-
-      {/* Scan bar */}
-      <div className="rounded-2xl p-4 flex flex-wrap items-center gap-4" style={card}>
-        <div className="text-sm font-semibold" style={{ color: C.text }}>{all.length} / {pages.length} pages scanned</div>
-        {remaining.length > 0 && <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: '#fffbeb', color: '#b45309' }}>{remaining.length} remaining</span>}
-        <div className="flex-1 min-w-[120px] h-2 rounded-full overflow-hidden" style={{ background: C.bg }}>
-          <div className="h-full rounded-full transition-all" style={{ width: `${progress}%`, background: C.accent }} />
+      {/* Header */}
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: C.accentBg }}><Shield size={20} style={{ color: C.accent }} /></div>
+          <div>
+            <h1 className="text-2xl font-bold" style={{ color: C.text }}>SEO Health</h1>
+            <p className="text-sm" style={{ color: C.muted }}>Comprehensive technical SEO audit for all your pages</p>
+          </div>
         </div>
-        {scanning ? (
-          <button onClick={() => { stopRef.current = true }} className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold" style={{ background: '#fef2f2', border: '1px solid #fecaca', color: '#dc2626' }}>
-            <Loader2 size={15} className="animate-spin" /> Stop
-          </button>
-        ) : (
-          <>
-            {remaining.length > 0 && (
-              <button onClick={() => scan(remaining.slice(0, 8))}
-                className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold" style={{ background: C.card, border: `1px solid ${C.border}`, color: C.text }}>
-                <Play size={15} /> Scan next 8
-              </button>
-            )}
-            <button onClick={() => scan(pages)} disabled={!pages.length}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold text-white disabled:opacity-50" style={{ background: C.accent }}>
-              <Zap size={15} /> {all.length ? 'Re-scan all' : `Scan all (${pages.length})`}
+        <div className="flex items-center gap-2">
+          {all.length > 0 && (
+            <button onClick={exportCsv} className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium" style={{ background: C.card, border: `1px solid ${C.border}`, color: C.muted }}>
+              <Download size={15} /> Export CSV
             </button>
-            {all.length > 0 && (
-              <button onClick={exportCsv} className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium" style={{ background: C.card, border: `1px solid ${C.border}`, color: C.muted }}>
-                Export CSV
-              </button>
-            )}
-          </>
-        )}
+          )}
+          <button onClick={rescan} disabled={scanning || !pages.length}
+            className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold text-white disabled:opacity-60" style={{ background: C.accent }}>
+            {scanning ? <Loader2 size={15} className="animate-spin" /> : <RefreshCw size={15} />} {scanning ? 'Scanning…' : 'Re-scan'}
+          </button>
+        </div>
       </div>
 
       {error && <div className="rounded-xl px-4 py-3 text-sm" style={{ background: '#fef2f2', border: '1px solid #fecaca', color: '#b91c1c' }}>{error}</div>}
 
-      {all.length === 0 ? (
+      {initialScanning ? (
+        /* ── Initial scan overlay ── */
+        <div className="rounded-2xl p-16 flex flex-col items-center justify-center text-center" style={card}>
+          <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-5" style={{ background: C.accentBg }}>
+            <RefreshCw size={30} style={{ color: C.accent }} className="animate-spin" />
+          </div>
+          <h2 className="text-xl font-bold mb-2" style={{ color: C.text }}>Scanning Your Site…</h2>
+          <p className="text-sm mb-5 max-w-md" style={{ color: C.muted }}>
+            Fetching pages from your sitemap and running on-page SEO checks across {SEO_CATEGORIES.length} categories. First batch of {Math.min(BATCH, pages.length)} pages loading…
+          </p>
+          <div className="w-64 h-2 rounded-full overflow-hidden" style={{ background: C.bg }}>
+            <div className="h-full rounded-full animate-pulse" style={{ width: '55%', background: C.accent }} />
+          </div>
+        </div>
+      ) : all.length === 0 ? (
+        /* ── Empty state ── */
         <div className="rounded-2xl p-16 text-center" style={card}>
           <Gauge size={40} style={{ color: C.faint }} className="mx-auto mb-4" />
           <h2 className="text-lg font-semibold mb-1" style={{ color: C.text }}>No scan yet</h2>
-          <p className="text-sm" style={{ color: C.muted }}>Click “Scan All” to audit your {pages.length} pages.</p>
+          <p className="text-sm mb-5" style={{ color: C.muted }}>Run a scan to audit your {pages.length} pages.</p>
+          <button onClick={rescan} disabled={!pages.length} className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold text-white disabled:opacity-50" style={{ background: C.accent }}>
+            <Play size={15} /> Run scan
+          </button>
         </div>
       ) : (
         <>
+          {/* Scan bar */}
+          <div className="rounded-2xl p-4 flex flex-wrap items-center gap-4" style={card}>
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-semibold" style={{ color: C.text }}>{all.length} / {pages.length} pages scanned</span>
+              {remaining.length > 0 && <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: '#fffbeb', color: '#b45309' }}>{remaining.length} remaining</span>}
+              {scanning && <RefreshCw size={14} className="animate-spin" style={{ color: C.accent }} />}
+            </div>
+            <div className="flex-1 min-w-[120px] h-2 rounded-full overflow-hidden" style={{ background: C.bg }}>
+              <div className="h-full rounded-full transition-all" style={{ width: `${progress}%`, background: C.accent }} />
+            </div>
+            {scanning ? (
+              <button onClick={() => { stopRef.current = true }} className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold" style={{ background: '#fef2f2', border: '1px solid #fecaca', color: '#dc2626' }}>
+                <XCircle size={15} /> Stop
+              </button>
+            ) : remaining.length > 0 ? (
+              <>
+                <button onClick={scanNext} className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold text-white" style={{ background: C.accent }}>
+                  <Play size={15} /> Scan Next {Math.min(remaining.length, BATCH)}
+                </button>
+                <button onClick={scanAll} className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold" style={{ background: C.card, border: `1px solid ${C.border}`, color: C.text }}>
+                  <Zap size={15} /> Scan All ({remaining.length})
+                </button>
+              </>
+            ) : null}
+          </div>
+
           {/* Score */}
           <div className="rounded-2xl p-6 flex flex-wrap items-center gap-6" style={card}>
             <Ring score={score} />
@@ -215,7 +252,6 @@ export default function SeoHealth() {
             ))}
           </div>
 
-          {/* Tab content */}
           {tab === 'overview' && (
             <div>
               <h3 className="text-sm font-semibold mb-3" style={{ color: C.text }}>Category Breakdown</h3>
