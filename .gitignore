@@ -5,3 +5,9 @@ node_modules
 .claude/
 
 .vercel
+
+# Cloudflare / OpenNext build output
+.open-next/
+.wrangler/
+.dev.vars
+cloudflare-env.d.ts
